@@ -10,6 +10,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -24,11 +26,15 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Windows on 06/02/2018.
  */
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
+    protected Spinner firstPos, desPos;// dropdown first position, destination position
 
 
     private static final String TAG="MapActivity";
@@ -90,9 +96,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         getLocationPermission();
+
+        this.addItemsOnSpinner1();
     }
-
-
 
     private void getDeviceLocation(){
         Log.d(TAG, "getDeviceLocation: get current location");
@@ -183,5 +189,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+    public void addItemsOnSpinner1(){
+        this.firstPos=findViewById(R.id.your_position);
+        ArrayAdapter<CharSequence> firstPosition=ArrayAdapter.createFromResource(this, R.array.station, android.R.layout.simple_spinner_item);
+        firstPosition.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        this.firstPos.setAdapter(firstPosition);
 
+        this.desPos=findViewById(R.id.your_destination);
+        ArrayAdapter<CharSequence> destinationPosition=ArrayAdapter.createFromResource(this, R.array.station, android.R.layout.simple_spinner_item);
+        destinationPosition.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        this.desPos.setAdapter(destinationPosition);
+    }
 }

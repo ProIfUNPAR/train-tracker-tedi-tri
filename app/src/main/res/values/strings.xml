@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">mapfix</string>
+    <string-array name="station">
+        <item>Stasiun Bandung (St.Hall)</item>
+        <item>Stasiun Ciroyom (CIR)</item>
+        <item>Stasiun Andir (AND)</item>
+        <item>Stasiun Cimindi (CMD)</item>
+        <item>Stasiun Cikudapateuh (CTH)</item>
+        <item>Stasiun Kiaracondong (KAC)</item>
+        <item>Stasiun Gedebage (GDB)</item>
+    </string-array>
 </resources>

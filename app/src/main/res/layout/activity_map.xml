@@ -19,11 +19,11 @@
             android:background="#940000"
             />
 
-        <EditText
+        <Spinner
+            android:id="@+id/your_position"
             android:layout_width="130pt"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10pt"
-            android:hint="Your in "/>
+            android:layout_marginTop="25dp"/>
 
     </LinearLayout>
 
@@ -34,10 +34,10 @@
         android:background="#FFF68F"
         android:gravity="right">
 
-        <Button
+        <ImageButton
             android:layout_width="20pt"
-            android:layout_height="wrap_content"
-            android:text="a"/>
+            android:layout_height="20pt"
+            android:src="@android:drawable/ic_menu_rotate"/>
 
 
     </LinearLayout>
@@ -57,11 +57,11 @@
             android:background="#940000"
             />
 
-        <EditText
+        <Spinner
+            android:id="@+id/your_destination"
             android:layout_width="130pt"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5pt"
-            android:hint="Your Destination"/>
+            android:layout_marginTop="15dp"/>
 
     </LinearLayout>
 
