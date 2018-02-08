@@ -30,18 +30,7 @@ import com.google.android.gms.tasks.Task;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        Toast.makeText(this,"Map Ready",Toast.LENGTH_SHORT).show();
-        Log.d(TAG, "onMapReady: map is ready");
-        Gmap=googleMap;
 
-        if(locPermission){
-            getDeviceLocation();
-            //Gmap.setMyLocationEnabled(true);
-
-        }
-    }
     private static final String TAG="MapActivity";
 
     private static final String fine_loc="Manifest.permission.ACCESS_FINE_LOCATION";
@@ -49,7 +38,51 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private static final int Location_permission_request_code=1234;
     private boolean locPermission=false;
     private GoogleMap Gmap;
-   private FusedLocationProviderClient location_provider;
+    private FusedLocationProviderClient location_provider;
+
+    public Stasiun[] stasiun=new Stasiun[7];
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        Toast.makeText(this,"Map Ready",Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onMapReady: map is ready");
+        Gmap=googleMap;
+
+
+        if(locPermission){
+
+            getDeviceLocation();
+
+            //Gmap.setMyLocationEnabled(true);
+
+        }
+    }
+
+    private void initStation() {
+        location_provider= LocationServices.getFusedLocationProviderClient(this);
+        String stationlocation=location_provider.toString();
+        ///////////////init stasiun////////////////
+
+        stasiun[0]=new Stasiun("Stasiun Hall Bandung",-6.9146455,107.6023063,stationlocation);
+        stasiun[1]=new Stasiun("Stasiun Ciroyom",-6.914000, 107.590145,stationlocation);
+        stasiun[2]=new Stasiun("Stasiun Cimindi",-6.895880, 107.561183,stationlocation);
+        stasiun[3]=new Stasiun("Stasiun Cikudapateuh", -6.918831, 107.625903,stationlocation);
+        stasiun[4]=new Stasiun("Stasiun Kiaracondong",-6.924929, 107.646303,stationlocation);
+        stasiun[5]=new Stasiun("Stasiun Gedebage", -6.940873, 107.689515,stationlocation);
+
+        /////////////end init stasiun//////////////
+
+
+        for (int i = 0; i <stasiun.length ; i++) {
+            Gmap.addMarker(new MarkerOptions()
+                    .position(new LatLng(stasiun[i].getLatitude(), stasiun[i].getLongitude()))
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                    .title(stasiun[i].getNama()));
+        }
+
+    }
+
+
 
 
     @Override
@@ -82,7 +115,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                                     .title("current location"));
                             moveCamera(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()),15f);
-
+                            initStation();
                         }else{
                             Log.d(TAG, "onComplete: location not found");
                         }

@@ -10,9 +10,12 @@ public class Stasiun {
     private String nama;
     private Location lokasi;
 
-    public Stasiun(double x, double y){
+    public Stasiun(String nama,double x, double y,String LocationProvider){
+        this.lokasi=new Location(LocationProvider);
+        this.nama=nama;
         this.lokasi.setLatitude(x);
         this.lokasi.setLongitude(y);
+
     }
 
     public String getNama(){
