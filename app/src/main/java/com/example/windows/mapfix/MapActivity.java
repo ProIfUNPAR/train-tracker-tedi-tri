@@ -46,7 +46,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private GoogleMap Gmap;
     private FusedLocationProviderClient location_provider;
 
-    public Stasiun[] stasiun=new Stasiun[7];
+    public Stasiun[] stasiun=new Stasiun[15];
     public Train[] Trains=new Train[5];
 
     @Override
@@ -92,10 +92,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Trains[0].addStasiun(stasiun[8]);
 
         for (int i = 0; i <Trains[0].stasiun.size()-1 ; i++) {
+            Stasiun temp=Trains[0].getStop(i);
             Gmap.addMarker(new MarkerOptions()
-                    .position(new LatLng(stasiun[i].getLatitude(), stasiun[i].getLongitude()))
+                    .position(new LatLng(temp.getLatitude(),temp.getLongitude()))
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-                    .title(stasiun[i].getNama()));
+                    .title(temp.getNama()));
         }
 
 

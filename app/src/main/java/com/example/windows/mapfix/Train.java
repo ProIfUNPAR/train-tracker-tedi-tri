@@ -11,7 +11,7 @@ import java.util.LinkedList;
 public class Train {
 
     private String nama;
-    public LinkedList stasiun = new LinkedList();
+    public LinkedList stasiun = new LinkedList<Stasiun>();
 
 
     public Train(String nama){
@@ -33,6 +33,10 @@ public class Train {
         this.stasiun.add(stasiun);
     }
 
+    public Stasiun getStop(int index){
+        Stasiun stop=Stasiun.class.cast(this.stasiun.get(index));
+        return stop;
+    }
 
     }
 
