@@ -47,6 +47,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private FusedLocationProviderClient location_provider;
 
     public Stasiun[] stasiun=new Stasiun[7];
+    public Train[] Trains=new Train[5];
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -75,16 +76,39 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         stasiun[3]=new Stasiun("Stasiun Cikudapateuh", -6.918831, 107.625903,stationlocation);
         stasiun[4]=new Stasiun("Stasiun Kiaracondong",-6.924929, 107.646303,stationlocation);
         stasiun[5]=new Stasiun("Stasiun Gedebage", -6.940873, 107.689515,stationlocation);
+        stasiun[6]=new Stasiun("Stasiun Andir", -6.907938, 107.579256,stationlocation);
+        stasiun[7]=new Stasiun("Stasiun Cimahi", -6.885427, 107.536122,stationlocation);
+        stasiun[8]=new Stasiun("Stasiun Cicalengka",  -6.981199, 107.832652,stationlocation);
+        stasiun[9]=new Stasiun("stasiun rancaekek",-6.963572, 107.755793,stationlocation);
+
 
         /////////////end init stasiun//////////////
 
+        ////////////init kereta///////////////////
+        Trains[0]=new Train("patas bandung");
+        Trains[0].addStasiun(stasiun[4]);
+        Trains[0].addStasiun(stasiun[5]);
+        Trains[0].addStasiun(stasiun[9]);
+        Trains[0].addStasiun(stasiun[8]);
 
-        for (int i = 0; i <stasiun.length ; i++) {
+        for (int i = 0; i <Trains[0].stasiun.size()-1 ; i++) {
             Gmap.addMarker(new MarkerOptions()
                     .position(new LatLng(stasiun[i].getLatitude(), stasiun[i].getLongitude()))
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
                     .title(stasiun[i].getNama()));
         }
+
+
+
+
+        /////////////////////////////////////////
+
+      /**for (int i = 0; i <stasiun.length-1 ; i++) {
+            Gmap.addMarker(new MarkerOptions()
+                    .position(new LatLng(stasiun[i].getLatitude(), stasiun[i].getLongitude()))
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                    .title(stasiun[i].getNama()));
+        }*/
 
     }
 
