@@ -1,6 +1,7 @@
 package com.example.windows.mapfix;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -26,9 +27,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by Windows on 06/02/2018.
  */
@@ -37,30 +35,42 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected Spinner firstPos, desPos;// dropdown first position, destination position
 
 
-    private static final String TAG="MapActivity";
+    private static final String TAG = "MapActivity";
 
-    private static final String fine_loc="Manifest.permission.ACCESS_FINE_LOCATION";
-    private static final String coarse_loc="Manifest.permission.ACCESS_COARSE_LOCATION";
-    private static final int Location_permission_request_code=1234;
-    private boolean locPermission=false;
+    private static final String fine_loc = "Manifest.permission.ACCESS_FINE_LOCATION";
+    private static final String coarse_loc = "Manifest.permission.ACCESS_COARSE_LOCATION";
+    private static final int Location_permission_request_code = 1234;
+    private boolean locPermission = false;
     private GoogleMap Gmap;
     private FusedLocationProviderClient location_provider;
-
-    public Stasiun[] stasiun=new Stasiun[15];
-    public Train[] Trains=new Train[5];
+    private Location currentLocation;
+    public Stasiun[] stasiun = new Stasiun[15];
+    public Train[] Trains = new Train[5];
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Toast.makeText(this,"Map Ready",Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this,"Map Ready",Toast.LENGTH_SHORT).show();
         Log.d(TAG, "onMapReady: map is ready");
-        Gmap=googleMap;
-
-
-        if(locPermission){
+        Gmap = googleMap;
+        Intent intent = new Intent(this, TrackService.class);
+        startService(intent);
+        Toast.makeText(this, "tracking location", Toast.LENGTH_SHORT).show();
+        if (locPermission) {
 
             getDeviceLocation();
 
-            //Gmap.setMyLocationEnabled(true);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            Gmap.setMyLocationEnabled(true);
+
 
         }
     }
@@ -139,14 +149,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     public void onComplete(@NonNull Task task) {
                         if(task.isSuccessful()){
                             Log.d(TAG, "onComplete: location found");
-                            Location currentLocation=(Location)task.getResult();
+                            currentLocation=(Location)task.getResult();
+                            if(currentLocation!=null) {
+                                Gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 15f));
+                                initStation();
+                            }
+                            else{
+                                Toast.makeText(getApplicationContext(),"cannot found location",Toast.LENGTH_LONG).show();
 
-                            Gmap.addMarker(new MarkerOptions()
-                                    .position(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()))
-                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                                    .title("current location"));
-                            moveCamera(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()),15f);
-                            initStation();
+                            }
                         }else{
                             Log.d(TAG, "onComplete: location not found");
                         }
@@ -159,15 +170,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
    }
 
 
-    private void moveCamera(LatLng latLng, float zoom){
+    /**private void moveCamera(LatLng latLng, float zoom){
         Log.d(TAG, "moveCamera: camera move to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
         Gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
-    }
+    }*/
 
     private void initMap(){
         SupportMapFragment mapFragment= (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 
         mapFragment.getMapAsync(MapActivity.this);
+
+
     }
 
     private void getLocationPermission(){
@@ -192,6 +205,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     Location_permission_request_code);
         }
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -225,4 +239,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         destinationPosition.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         this.desPos.setAdapter(destinationPosition);
     }
+
+
+
+
 }
