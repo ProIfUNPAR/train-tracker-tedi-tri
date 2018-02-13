@@ -2,6 +2,7 @@ package com.example.windows.mapfix;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,8 +11,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -22,10 +26,14 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +41,7 @@ import java.util.List;
  * Created by Windows on 06/02/2018.
  */
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, RouteFinderListener {
     protected Spinner firstPos, desPos;// dropdown first position, destination position
 
 
@@ -45,6 +53,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private boolean locPermission=false;
     private GoogleMap Gmap;
     private FusedLocationProviderClient location_provider;
+    private Spinner your_position;
+    private Spinner your_destination;
+    private Button buttonrute;
+    private List<Marker> originMarkers = new ArrayList<>();
+    private List<Marker> destinationMarkers = new ArrayList<>();
+    private List<Polyline> polylinePaths = new ArrayList<>();
 
     public Stasiun[] stasiun=new Stasiun[15];
     public Train[] Trains=new Train[5];
@@ -91,13 +105,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Trains[0].addStasiun(stasiun[9]);
         Trains[0].addStasiun(stasiun[8]);
 
-        for (int i = 0; i <Trains[0].stasiun.size()-1 ; i++) {
+        /**for (int i = 0; i <Trains[0].stasiun.size()-1 ; i++) {
             Stasiun temp=Trains[0].getStop(i);
             Gmap.addMarker(new MarkerOptions()
                     .position(new LatLng(temp.getLatitude(),temp.getLongitude()))
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
                     .title(temp.getNama()));
-        }
+        }*/
 
 
 
@@ -123,6 +137,34 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         getLocationPermission();
 
         this.addItemsOnSpinner1();
+
+        your_position = (Spinner) findViewById(R.id.your_position);
+        your_destination = (Spinner) findViewById(R.id.your_destination);
+        buttonrute = (Button) findViewById(R.id.buttonrute);
+        buttonrute.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendRequest();
+            }
+        });
+    }
+    private void sendRequest(){
+        String origin = your_position.getSelectedItem().toString();
+        String destination = your_destination.getSelectedItem().toString();
+        if(origin.isEmpty()){
+            Toast.makeText(this, "Please select origin station!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(destination.isEmpty()){
+            Toast.makeText(this, "Please select destination station!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try{
+            new Route(this, origin, destination).execute();
+        }
+        catch(UnsupportedEncodingException e){
+            e.printStackTrace();
+        }
     }
 
     private void getDeviceLocation(){
@@ -214,15 +256,69 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    public void addItemsOnSpinner1(){
-        this.firstPos=findViewById(R.id.your_position);
-        ArrayAdapter<CharSequence> firstPosition=ArrayAdapter.createFromResource(this, R.array.station, android.R.layout.simple_spinner_item);
+    public void addItemsOnSpinner1() {
+        this.firstPos = findViewById(R.id.your_position);
+        ArrayAdapter<CharSequence> firstPosition = ArrayAdapter.createFromResource(this, R.array.station, android.R.layout.simple_spinner_item);
         firstPosition.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         this.firstPos.setAdapter(firstPosition);
 
-        this.desPos=findViewById(R.id.your_destination);
-        ArrayAdapter<CharSequence> destinationPosition=ArrayAdapter.createFromResource(this, R.array.station, android.R.layout.simple_spinner_item);
+        this.desPos = findViewById(R.id.your_destination);
+        ArrayAdapter<CharSequence> destinationPosition = ArrayAdapter.createFromResource(this, R.array.station, android.R.layout.simple_spinner_item);
         destinationPosition.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         this.desPos.setAdapter(destinationPosition);
     }
+    @Override
+    public void onRouteFinderStart() {
+        if (originMarkers != null) {
+            for (Marker marker : originMarkers) {
+                marker.remove();
+            }
+        }
+
+        if (destinationMarkers != null) {
+            for (Marker marker : destinationMarkers) {
+                marker.remove();
+            }
+        }
+
+        if (polylinePaths != null) {
+            for (Polyline polyline:polylinePaths ) {
+                polyline.remove();
+            }
+        }
+    }
+
+    @Override
+    public void onRouteFinderSuccess(List<Rute> routes) {
+        polylinePaths = new ArrayList<>();
+        originMarkers = new ArrayList<>();
+        destinationMarkers = new ArrayList<>();
+
+        for (Rute route : routes) {
+            Gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(route.startLocation, 16));
+            //((TextView) findViewById(R.id.tvDuration)).setText(route.duration.text);
+            //((TextView) findViewById(R.id.tvDistance)).setText(route.distance.text);
+
+            originMarkers.add(Gmap.addMarker(new MarkerOptions()
+                    //.icon(BitmapDescriptorFactory.fromResource(R.drawable.start_blue))
+                    .title(route.startAddress)
+                    .position(route.startLocation)));
+            destinationMarkers.add(Gmap.addMarker(new MarkerOptions()
+                    //.icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
+                    .title(route.endAddress)
+                    .position(route.endLocation)));
+
+            PolylineOptions polylineOptions = new PolylineOptions().
+                    geodesic(true).
+                    color(Color.BLUE).
+                    width(10);
+
+            for (int i = 0; i < route.points.size(); i++)
+                polylineOptions.add(route.points.get(i));
+
+            polylinePaths.add(Gmap.addPolyline(polylineOptions));
+        }
+    }
+
+
 }
