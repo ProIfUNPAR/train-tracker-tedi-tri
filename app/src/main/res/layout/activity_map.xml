@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
     <LinearLayout
         android:layout_width="match_parent"
@@ -78,40 +79,31 @@
             android:layout_height="wrap_content"
             android:text="Launch"/>
 
-    </LinearLayout>
-
-
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/map"
-        tools:context=".MapsActivity"
-        android:name="com.google.android.gms.maps.SupportMapFragment" />
-<<<<<<< HEAD
-
-    <LinearLayout
-        xmlns:tools="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical">
-
         <TextView
             android:id="@+id/txtCurrentSpeed"
             tools:layout_width="wrap_content"
             tools:layout_height="wrap_content"
             android:text="000.0 mile/hour"
-            android:textAppearance="?android:attr/textAppearanceLarge"/>
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content" />
 
         <CheckBox
             android:id="@+id/chMetricUnits"
             tools:layout_width="wrap_content"
             tools:layout_height="wrap_content"
             android:text="Use metric units?"
-            />
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content" />
+
+
 
     </LinearLayout>
-</android.support.constraint.ConstraintLayout>
-=======
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context=".MapsActivity" />
 </LinearLayout>
->>>>>>> 86b7114bc9ed5b2f5eec77e71796df2a8afbf12f

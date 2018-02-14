@@ -3,10 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-<<<<<<< HEAD
-      <module fileurl="file://F:\train-tracker-tedi-tri\mapfix.iml" filepath="F:\train-tracker-tedi-tri\mapfix.iml" />
-=======
->>>>>>> 86b7114bc9ed5b2f5eec77e71796df2a8afbf12f
       <module fileurl="file://$PROJECT_DIR$/train-tracker-tedi-tri.iml" filepath="$PROJECT_DIR$/train-tracker-tedi-tri.iml" />
     </modules>
   </component>
