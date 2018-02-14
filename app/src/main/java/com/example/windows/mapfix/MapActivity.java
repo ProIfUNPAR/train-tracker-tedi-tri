@@ -1,10 +1,15 @@
 package com.example.windows.mapfix;
 
 import android.Manifest;
+<<<<<<< HEAD
+import android.content.Context;
+=======
 import android.content.Intent;
+>>>>>>> 86b7114bc9ed5b2f5eec77e71796df2a8afbf12f
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,10 +17,15 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+<<<<<<< HEAD
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+=======
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+>>>>>>> 86b7114bc9ed5b2f5eec77e71796df2a8afbf12f
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,14 +44,32 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+import java.util.Formatter;
+import java.util.Locale;
+
+=======
+<<<<<<< HEAD
+>>>>>>> e836620df702ba9fe11b720b13d2486b0fdca1e3
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> 928af36786255269fc7b4f34df8a5fd3d06d9823
+>>>>>>> 86b7114bc9ed5b2f5eec77e71796df2a8afbf12f
+>>>>>>> e836620df702ba9fe11b720b13d2486b0fdca1e3
 /**
  * Created by Windows on 06/02/2018.
  */
 
+<<<<<<< HEAD
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback , IBaseGpsListener {
+=======
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, RouteFinderListener {
     protected Spinner firstPos, desPos;// dropdown first position, destination position
 
@@ -64,6 +92,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Location currentLocation;
     public Stasiun[] stasiun = new Stasiun[15];
     public Train[] Trains = new Train[5];
+<<<<<<< HEAD
+=======
+>>>>>>> 928af36786255269fc7b4f34df8a5fd3d06d9823
+>>>>>>> 86b7114bc9ed5b2f5eec77e71796df2a8afbf12f
+>>>>>>> e836620df702ba9fe11b720b13d2486b0fdca1e3
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -93,6 +126,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+<<<<<<< HEAD
+    private static final String fine_loc="Manifest.permission.ACCESS_FINE_LOCATION";
+    private static final String coarse_loc="Manifest.permission.ACCESS_COARSE_LOCATION";
+    private static final int Location_permission_request_code=1234;
+    private boolean locPermission=false;
+    private GoogleMap Gmap;
+    private FusedLocationProviderClient location_provider;
+=======
     private void initStation() {
         location_provider= LocationServices.getFusedLocationProviderClient(this);
         String stationlocation=location_provider.toString();
@@ -142,6 +183,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
 
+>>>>>>> 86b7114bc9ed5b2f5eec77e71796df2a8afbf12f
 
 
     @Override
@@ -149,8 +191,54 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         getLocationPermission();
+<<<<<<< HEAD
+        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this );
+        this.updateSpeed(null);
+
+        CheckBox chUseMetric = (CheckBox) this.findViewById(R.id.chMetricUnits);
+        chUseMetric.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                MapActivity.this.updateSpeed(null);
+            }
+        });
+    }
+
+    public void finish(){
+        super.finish();
+        System.exit(0);
+    }
+
+    private void updateSpeed(CLocation location) {
+        float nCurrentSpeed =0;
+
+        if(location != null){
+            location.setUseMetricUnits(this.useMetricUnits());
+            nCurrentSpeed = location.getSpeed();
+        }
+
+        Formatter fmt = new Formatter(new StringBuilder());
+        fmt.format(Locale.US, "%5.1f", nCurrentSpeed);
+        String strCurrentSpeed = fmt.toString();
+        strCurrentSpeed = strCurrentSpeed.replace(' ', '0');
+
+        String strUnits = "miles/hour";
+        if(this.useMetricUnits()){
+            strUnits = "meters/second";
+        }
+        TextView txtCurrentSpeed = (TextView) this.findViewById(R.id.txtCurrentSpeed);
+        txtCurrentSpeed.setText(strCurrentSpeed + " "+ strUnits);
+    }
+
+    private boolean useMetricUnits() {
+        CheckBox chUseMetricUnits = (CheckBox) this.findViewById(R.id.chMetricUnits);
+        return chUseMetricUnits.isChecked();
+    }
+=======
 
         this.addItemsOnSpinner1();
+>>>>>>> 86b7114bc9ed5b2f5eec77e71796df2a8afbf12f
 
         your_position = (Spinner) findViewById(R.id.your_position);
         your_destination = (Spinner) findViewById(R.id.your_destination);

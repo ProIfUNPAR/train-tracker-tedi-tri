@@ -88,4 +88,30 @@
         android:id="@+id/map"
         tools:context=".MapsActivity"
         android:name="com.google.android.gms.maps.SupportMapFragment" />
+<<<<<<< HEAD
+
+    <LinearLayout
+        xmlns:tools="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/txtCurrentSpeed"
+            tools:layout_width="wrap_content"
+            tools:layout_height="wrap_content"
+            android:text="000.0 mile/hour"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+        <CheckBox
+            android:id="@+id/chMetricUnits"
+            tools:layout_width="wrap_content"
+            tools:layout_height="wrap_content"
+            android:text="Use metric units?"
+            />
+
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>
+=======
 </LinearLayout>
+>>>>>>> 86b7114bc9ed5b2f5eec77e71796df2a8afbf12f
