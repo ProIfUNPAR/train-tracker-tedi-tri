@@ -34,13 +34,10 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-<<<<<<< HEAD
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-=======
->>>>>>> 928af36786255269fc7b4f34df8a5fd3d06d9823
 /**
  * Created by Windows on 06/02/2018.
  */
@@ -57,7 +54,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private boolean locPermission = false;
     private GoogleMap Gmap;
     private FusedLocationProviderClient location_provider;
-<<<<<<< HEAD
     private Spinner your_position;
     private Spinner your_destination;
     private Button buttonrute;
@@ -65,13 +61,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private List<Marker> destinationMarkers = new ArrayList<>();
     private List<Polyline> polylinePaths = new ArrayList<>();
 
-    public Stasiun[] stasiun=new Stasiun[15];
-    public Train[] Trains=new Train[5];
-=======
     private Location currentLocation;
     public Stasiun[] stasiun = new Stasiun[15];
     public Train[] Trains = new Train[5];
->>>>>>> 928af36786255269fc7b4f34df8a5fd3d06d9823
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -293,7 +285,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         destinationPosition.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         this.desPos.setAdapter(destinationPosition);
     }
-<<<<<<< HEAD
+
     @Override
     public void onRouteFinderStart() {
         if (originMarkers != null) {
@@ -346,10 +338,5 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             polylinePaths.add(Gmap.addPolyline(polylineOptions));
         }
     }
-=======
-
-
->>>>>>> 928af36786255269fc7b4f34df8a5fd3d06d9823
-
 
 }
