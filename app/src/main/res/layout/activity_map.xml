@@ -1,16 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#FFF68F">
+
+        <ImageView
+            android:layout_height="15pt"
+            android:layout_width="15pt"
+            android:layout_marginLeft="10pt"
+            android:layout_marginTop="10pt"
+            android:layout_marginRight="5pt"
+            android:background="#940000"
+            />
+
+        <Spinner
+            android:id="@+id/your_position"
+            android:layout_width="130pt"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#FFF68F"
+        android:gravity="right">
+
+        <ImageButton
+            android:layout_width="20pt"
+            android:layout_height="20pt"
+            android:src="@android:drawable/ic_menu_rotate"/>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#FFF68F">
+
+        <ImageView
+            android:layout_height="15pt"
+            android:layout_width="15pt"
+            android:layout_marginLeft="10pt"
+            android:layout_marginTop="5pt"
+            android:layout_marginRight="5pt"
+            android:background="#940000"
+            />
+
+        <Spinner
+            android:id="@+id/your_destination"
+            android:layout_width="130pt"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#FFF68F"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/buttonrute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Launch"/>
+
+    </LinearLayout>
+
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/map"
         tools:context=".MapsActivity"
         android:name="com.google.android.gms.maps.SupportMapFragment" />
+<<<<<<< HEAD
 
     <LinearLayout
         xmlns:tools="http://schemas.android.com/apk/res/android"
@@ -34,3 +112,6 @@
 
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
+=======
+</LinearLayout>
+>>>>>>> 86b7114bc9ed5b2f5eec77e71796df2a8afbf12f
