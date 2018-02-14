@@ -3,7 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/mapfix.iml" filepath="$PROJECT_DIR$/mapfix.iml" />
+      <module fileurl="file://F:\train-tracker-tedi-tri\mapfix.iml" filepath="F:\train-tracker-tedi-tri\mapfix.iml" />
+      <module fileurl="file://$PROJECT_DIR$/train-tracker-tedi-tri.iml" filepath="$PROJECT_DIR$/train-tracker-tedi-tri.iml" />
     </modules>
   </component>
 </project>
