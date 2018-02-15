@@ -10,7 +10,8 @@ import android.os.Bundle;
 
 public interface IBaseGpsListener extends LocationListener, GpsStatus.Listener{
 
-    public void onLocationChanged(Location location);
+    public void
+    onLocationChanged(Location location);
 
     public void onProviderDisabled(String provider);
 

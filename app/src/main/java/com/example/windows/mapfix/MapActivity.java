@@ -1,10 +1,12 @@
 package com.example.windows.mapfix;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,7 +17,10 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -34,18 +39,19 @@ import com.google.android.gms.tasks.Task;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.List;
+import java.util.Locale;
+
+import static com.example.windows.mapfix.R.id.chMetricUnits;
 
 /**
  * Created by Windows on 06/02/2018.
  */
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, RouteFinderListener,IBaseGpsListener {
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, RouteFinderListener, IBaseGpsListener {
     protected Spinner firstPos, desPos;// dropdown first position, destination position
-
-
     private static final String TAG = "MapActivity";
-
     private static final String fine_loc = "Manifest.permission.ACCESS_FINE_LOCATION";
     private static final String coarse_loc = "Manifest.permission.ACCESS_COARSE_LOCATION";
     private static final int Location_permission_request_code = 1234;
@@ -54,12 +60,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private FusedLocationProviderClient location_provider;
     private Spinner your_position;
     private Spinner your_destination;
-
     private Button buttonrute;
     private List<Marker> originMarkers = new ArrayList<>();
     private List<Marker> destinationMarkers = new ArrayList<>();
     private List<Polyline> polylinePaths = new ArrayList<>();
-
     private Location currentLocation;
     public Stasiun[] stasiun = new Stasiun[15];
     public Train[] Trains = new Train[5];
@@ -69,6 +73,100 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         getLocationPermission();
+        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        this.updateSpeed(null);
+
+        CheckBox chUseMetric = (CheckBox) this.findViewById(R.id.chMetricUnits);
+        chUseMetric.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                MapActivity.this.updateSpeed(null);
+            }
+        });
+    }
+    public void finish(){
+        super.finish();
+        System.exit(0);
+    }
+
+    private void updateSpeed(CLocation location) {
+        float nCurrentSpeed =0;
+
+        if(location != null){
+            location.setUseMetricUnits(this.useMetricUnits());
+            nCurrentSpeed = location.getSpeed();
+        }
+
+        Formatter fmt = new Formatter(new StringBuilder());
+        fmt.format(Locale.US, "%5.1f", nCurrentSpeed);
+        String strCurrentSpeed = fmt.toString();
+        strCurrentSpeed = strCurrentSpeed.replace(' ', '0');
+
+        String strUnits = "miles/hour";
+        if(this.useMetricUnits()){
+            strUnits = "meters/second";
+        }
+        TextView txtCurrentSpeed = (TextView) this.findViewById(R.id.txtCurrentSpeed);
+        txtCurrentSpeed.setText(strCurrentSpeed + " "+ strUnits);
+    }
+
+    private boolean useMetricUnits() {
+        CheckBox chUseMetricUnits = (CheckBox) this.findViewById(chMetricUnits);
+        return chUseMetricUnits.isChecked();
+    }
+
+    @Override
+    public void onLocationChanged(Location location){
+        if(location != null){
+            CLocation myLocation = new CLocation(location, this.useMetricUnits());
+            this.updateSpeed(myLocation);
+        }
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onGpsStatusChanged(int event) {
+
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
     }
 
     @Override
@@ -94,9 +192,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 return;
             }
             Gmap.setMyLocationEnabled(true);
-
-
-
         }
     }
 
@@ -167,6 +262,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             e.printStackTrace();
         }
     }
+
 
     private void getDeviceLocation(){
         Log.d(TAG, "getDeviceLocation: get current location");
@@ -326,38 +422,4 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onGpsStatusChanged(int event) {
-
-    }
-
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-
-    }
-
-    private boolean useMetricUnits() {
-        CheckBox chUseMetricUnits = (CheckBox) this.findViewById(R.id.chMetricUnits);
-        return chUseMetricUnits.isChecked();
-    }
 }
