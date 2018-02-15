@@ -9,7 +9,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -17,6 +19,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG= "MainActivity";
+    protected Spinner selectTrain;
 
     private static final int ERROR_DIALOG_REQUEST=9001;
     Button btnNotif;
@@ -24,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        addItemsOnSpinnerTrain();
 
         if(isServicesok()){
 
@@ -81,6 +85,13 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this,"cant make map request",Toast.LENGTH_SHORT).show();
         }
         return false;
+    }
+
+    public void addItemsOnSpinnerTrain() {
+        this.selectTrain = findViewById(R.id.select_train);
+        ArrayAdapter<CharSequence> trainselect = ArrayAdapter.createFromResource(this, R.array.station, android.R.layout.simple_spinner_item);
+        trainselect.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        this.selectTrain.setAdapter(trainselect);
     }
 
 }

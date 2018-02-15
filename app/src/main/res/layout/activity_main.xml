@@ -20,6 +20,14 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <Spinner
+            android:id="@+id/select_train"
+            android:layout_width="130pt"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:layout_marginBottom="25dp"/>
+
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
