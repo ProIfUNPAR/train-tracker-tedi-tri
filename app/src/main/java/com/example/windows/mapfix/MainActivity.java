@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
                         Notification noti = new Notification.Builder(com.example.windows.mapfix.MainActivity.this)
                                 .setTicker("TickerTitle")
                                 .setContentTitle("Train Tracker")
-                                .setContentText("Stasiun Berikutnya : ")
+                                .setContentText("Stasiun Berikutnya :                                           "+"Jarak   : ")
                                 .setSmallIcon(R.drawable.icon1)
                                 .setContentIntent(pIntent).getNotification();
                         vibrator.vibrate(10000);
