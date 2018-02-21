@@ -1,6 +1,7 @@
 package com.example.windows.mapfix;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -371,6 +372,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onRouteFinderStart() {
+        ProgressDialog progressDialog = ProgressDialog.show(this, "Hang on a sec",
+                "Finding route....", true);
         if (originMarkers != null) {
             for (Marker marker : originMarkers) {
                 marker.remove();
