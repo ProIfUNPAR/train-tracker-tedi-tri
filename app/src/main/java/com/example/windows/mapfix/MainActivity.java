@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -20,6 +21,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG= "MainActivity";
     protected Spinner selectTrain;
+    Vibrator vibrator;
 
     private static final int ERROR_DIALOG_REQUEST=9001;
     Button btnNotif;
@@ -46,6 +48,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         btnNotif = (Button)findViewById(R.id.buttonNotification);
+
+        vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
+
         btnNotif.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -58,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
                                 .setContentText("Stasiun Berikutnya : ")
                                 .setSmallIcon(R.drawable.icon1)
                                 .setContentIntent(pIntent).getNotification();
-
+                        vibrator.vibrate(10000);
                         noti.flags=Notification.FLAG_AUTO_CANCEL;
                         NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
                         nm.notify(0, noti);
