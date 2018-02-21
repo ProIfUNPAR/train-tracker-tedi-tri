@@ -105,6 +105,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 MapActivity.this.updateSpeed(null);
             }
         });
+
+        addItemsOnSpinner1();
     }
     public void finish(){
         super.finish();
