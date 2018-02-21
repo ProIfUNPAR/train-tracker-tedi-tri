@@ -2,6 +2,7 @@ package com.example.windows.mapfix;
 
 import android.annotation.SuppressLint;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.nearby.messages.Distance;
@@ -32,7 +33,6 @@ public class Route {
     private RouteFinderListener listener;
     private String origin;
     private String destination;
-    private Distance distance;
 
 
     public Route(RouteFinderListener listener, String origin, String destination){
@@ -48,7 +48,7 @@ public class Route {
     private String createUrl()throws UnsupportedEncodingException {
         String urlOrigin = URLEncoder.encode(origin, "utf-8");
         String urlDestination = URLEncoder.encode(destination, "utf-8");
-        return  DIRECTION_URL_API +"origin="+urlOrigin+"&destination="+urlDestination+"%key=" + GOOGLE_API_KEY;
+        return  DIRECTION_URL_API +"origin="+urlOrigin+"&destination="+urlDestination+"&mode=transit"+"&key=" + GOOGLE_API_KEY;
     }
 
 
@@ -67,6 +67,7 @@ public class Route {
                 while ((line = reader.readLine()) != null) {
                     buffer.append(line + "\n");
                 }
+                Log.d("wakandaa",buffer.toString());
                 return buffer.toString();
             } catch (MalformedURLException e) {
                 e.printStackTrace();

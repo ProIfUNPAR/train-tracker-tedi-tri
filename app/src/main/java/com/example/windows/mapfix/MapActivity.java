@@ -15,6 +15,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -30,6 +31,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -107,6 +109,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
 
         addItemsOnSpinner1();
+        your_position = (Spinner) findViewById(R.id.your_position);
+        your_destination = (Spinner) findViewById(R.id.your_destination);
+        buttonrute = (Button) findViewById(R.id.buttonrute);
+        buttonrute.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendRequest();
+            }
+        });
     }
     public void finish(){
         super.finish();
@@ -248,16 +259,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void sendRequest(){
+        Log.d("asd", your_position.getSelectedItem().toString());
         String origin = your_position.getSelectedItem().toString();
         String destination = your_destination.getSelectedItem().toString();
-        if(origin.isEmpty()){
-            Toast.makeText(this, "Please select origin station!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if(destination.isEmpty()){
-            Toast.makeText(this, "Please select destination station!", Toast.LENGTH_SHORT).show();
-            return;
-        }
         try{
             new Route(this, origin, destination).execute();
         }
@@ -374,8 +378,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onRouteFinderStart() {
-        ProgressDialog progressDialog = ProgressDialog.show(this, "Hang on a sec",
-                "Finding route....", true);
+        //ProgressDialog progressDialog = ProgressDialog.show(this, "Hang on a sec",
+          //      "Finding route....", true);
         if (originMarkers != null) {
             for (Marker marker : originMarkers) {
                 marker.remove();
@@ -397,6 +401,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onRouteFinderSuccess(List<Rute> routes) {
+        Log.d("asdwakanda", "asdwakandaaaaa");
         polylinePaths = new ArrayList<>();
         originMarkers = new ArrayList<>();
         destinationMarkers = new ArrayList<>();
@@ -407,11 +412,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             //((TextView) findViewById(R.id.tvDistance)).setText(route.distance.text);
 
             originMarkers.add(Gmap.addMarker(new MarkerOptions()
-                    //.icon(BitmapDescriptorFactory.fromResource(R.drawable.start_blue))
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
                     .title(route.startAddress)
                     .position(route.startLocation)));
             destinationMarkers.add(Gmap.addMarker(new MarkerOptions()
-                    //.icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
                     .title(route.endAddress)
                     .position(route.endLocation)));
 
