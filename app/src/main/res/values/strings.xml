@@ -11,4 +11,69 @@
         <item>Universitas Katolik Parahyangan</item>
         <item>Cihampelas Walk</item>
     </string-array>
+
+    <string-array name="train">
+        <item>~SELECT YOUR TRAIN~</item>
+        <item>Argo Bromo</item>
+        <item>Argo Wilis</item>
+        <item>Argo Lawu</item>
+        <item>Argo Dwipangga</item>
+        <item>Argo Sindoro</item>
+        <item>Argo Muria</item>
+        <item>Argo Jati</item>
+        <item>Argo Parahyangan</item>
+        <item>Gajayana</item>
+        <item>Bima</item>
+        <item>Sembrani</item>
+        <item>Turangga</item>
+        <item>Taksaka</item>
+        <item>Bangunkarta</item>
+        <item>Purwojaya</item>
+        <item>Cirebon Express</item>
+        <item>Tegal Bahari</item>
+        <item>Harina</item>
+        <item>Gumarang</item>
+        <item>Lodaya</item>
+        <item>Sancaka</item>
+        <item>Mutiara Timur</item>
+        <item>Ciremai Express</item>
+        <item>Malabar</item>
+        <item>Malioboro Express</item>
+        <item>Pangrango/ Siliwangi</item>
+        <item>Mutiara Selatan</item>
+        <item>Senja Utama</item>
+        <item>Fajar Utama</item>
+        <item>Sawunggalih</item>
+        <item>Sarangan Express</item>
+        <item>Sidomukti</item>
+        <item>Majapahit</item>
+        <item>Jayabaya</item>
+        <item>Jaka Tingkir</item>
+        <item>Menoreh</item>
+        <item>Bogowonto</item>
+        <item>Gajah Wong</item>
+        <item>Krakatau</item>
+        <item>Matarmaja</item>
+        <item>Gaya Baru Malam Selatan</item>
+        <item>Brantas</item>
+        <item>Kertajaya</item>
+        <item>Pasundan</item>
+        <item>Kahuripan</item>
+        <item>Bengawan</item>
+        <item>Progo</item>
+        <item>Logawa</item>
+        <item>Kutojaya Utara</item>
+        <item>Sri Tanjung</item>
+        <item>Tawang Jaya</item>
+        <item>Kutojaya Selatan</item>
+        <item>Tegal Arum</item>
+        <item>Tawang Alun</item>
+        <item>Tegal Express</item>
+        <item>Maharani</item>
+        <item>Kalijaga</item>
+        <item>Probowangi</item>
+        <item>Serayu</item>
+        <item>Kamandaka</item>
+        <item>Joglokerto</item>
+    </string-array>
 </resources>
