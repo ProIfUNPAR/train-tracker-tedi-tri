@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -53,8 +54,6 @@ public class MainActivity extends AppCompatActivity {
                 };
         this.selectTrain.setOnItemSelectedListener(onItemSelectedListener1);
 
-
-
         if(isServicesok()) {
             init();
         }
@@ -71,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         btnNotif = (Button)findViewById(R.id.buttonNotification);
+
         btnNotif.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -80,10 +80,9 @@ public class MainActivity extends AppCompatActivity {
                         Notification noti = new Notification.Builder(com.example.windows.mapfix.MainActivity.this)
                                 .setTicker("TickerTitle")
                                 .setContentTitle("Train Tracker")
-                                .setContentText("Stasiun Berikutnya : ")
+                                .setContentText("Stasiun Berikutnya :                                           "+"Jarak   : ")
                                 .setSmallIcon(R.drawable.icon1)
                                 .setContentIntent(pIntent).getNotification();
-
                         noti.flags=Notification.FLAG_AUTO_CANCEL;
                         NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
                         nm.notify(0, noti);

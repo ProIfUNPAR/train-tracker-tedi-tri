@@ -3,7 +3,7 @@ package com.example.windows.mapfix;
 import android.location.Location;
 
 /**
- * Created by no one on 2/8/2018.
+ * Created by Andreas on 2/8/2018.
  */
 
 public class CLocation extends Location{
