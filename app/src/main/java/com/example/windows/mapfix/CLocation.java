@@ -61,8 +61,8 @@ public class CLocation extends Location{
     public float getSpeed() {
         float nSpeed = super.getSpeed();
         if(!this.getUseMetricUnits()){
-            //convert meters/second to miles/hour
-            nSpeed =nSpeed*2.2369362920544f;
+            //convert meters/second to km/hour
+            nSpeed =nSpeed*3.6f;
 
         }
         return nSpeed;

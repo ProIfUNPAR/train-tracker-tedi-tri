@@ -137,9 +137,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         String strCurrentSpeed = fmt.toString();
         strCurrentSpeed = strCurrentSpeed.replace(' ', '0');
 
-        String strUnits = "miles/hour";
+        String strUnits = "km/jam";
         if(this.useMetricUnits()){
-            strUnits = "meters/second";
+            strUnits = "meter/detik";
         }
         TextView txtCurrentSpeed = (TextView) this.findViewById(R.id.txtCurrentSpeed);
         txtCurrentSpeed.setText(strCurrentSpeed + " "+ strUnits);
