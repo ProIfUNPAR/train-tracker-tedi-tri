@@ -81,17 +81,14 @@
 
         <TextView
             android:id="@+id/txtCurrentSpeed"
-            tools:layout_width="wrap_content"
-            tools:layout_height="wrap_content"
-            android:text="000.0 mile/hour"
-            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content" />
+            android:text="000.0 miles/hour"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            />
 
         <CheckBox
-            android:id="@+id/chMetricUnits"
-            tools:layout_width="wrap_content"
-            tools:layout_height="wrap_content"
+            android:id="@+id/chkMetricUnits"
             android:text="Use metric units?"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content" />
