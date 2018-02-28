@@ -10,18 +10,22 @@ import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG= "MainActivity";
     protected Spinner selectTrain;
-    Vibrator vibrator;
+    protected TextView textView;
 
     private static final int ERROR_DIALOG_REQUEST=9001;
     Button btnNotif;
@@ -29,13 +33,31 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        addItemsOnSpinnerTrain();
+        this.selectTrain = findViewById(R.id.select_train);
+        ArrayAdapter<CharSequence> trainselect = ArrayAdapter.createFromResource(this, R.array.train, android.R.layout.simple_spinner_item);
+        trainselect.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        this.selectTrain.setAdapter(trainselect);
+        this.textView=findViewById(R.id.textForSelectedTrain);
+        AdapterView.OnItemSelectedListener onItemSelectedListener1 =
+                new AdapterView.OnItemSelectedListener(){
 
-        if(isServicesok()){
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view,
+                                               int position, long id) {
+                        String type = selectTrain.getSelectedItem().toString().trim();
+                        textView.setText(type);
+                    }
 
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {}
 
+                };
+        this.selectTrain.setOnItemSelectedListener(onItemSelectedListener1);
+
+        if(isServicesok()) {
             init();
         }
+
     }
 
     private void init(){
@@ -49,8 +71,6 @@ public class MainActivity extends AppCompatActivity {
         });
         btnNotif = (Button)findViewById(R.id.buttonNotification);
 
-        vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
-
         btnNotif.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -63,7 +83,6 @@ public class MainActivity extends AppCompatActivity {
                                 .setContentText("Stasiun Berikutnya :                                           "+"Jarak   : ")
                                 .setSmallIcon(R.drawable.icon1)
                                 .setContentIntent(pIntent).getNotification();
-                        vibrator.vibrate(10000);
                         noti.flags=Notification.FLAG_AUTO_CANCEL;
                         NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
                         nm.notify(0, noti);
@@ -90,13 +109,6 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this,"cant make map request",Toast.LENGTH_SHORT).show();
         }
         return false;
-    }
-
-    public void addItemsOnSpinnerTrain() {
-        this.selectTrain = findViewById(R.id.select_train);
-        ArrayAdapter<CharSequence> trainselect = ArrayAdapter.createFromResource(this, R.array.station, android.R.layout.simple_spinner_item);
-        trainselect.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        this.selectTrain.setAdapter(trainselect);
     }
 
 }
