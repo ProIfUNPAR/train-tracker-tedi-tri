@@ -83,13 +83,13 @@
             android:id="@+id/txtCurrentSpeed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="000.0 miles/hour"
+            android:text="000.0 km/jam"
             android:textAppearance="?android:attr/textAppearanceLarge"
             />
 
         <CheckBox
             android:id="@+id/chkMetricUnits"
-            android:text="Use metric units?"
+            android:text="gunakan m/detik?"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content" />
 
