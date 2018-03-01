@@ -48,7 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import static com.example.windows.mapfix.R.id.chMetricUnits;
+import static com.example.windows.mapfix.R.id.chkMetricUnits;
 
 /**
  * Created by Windows on 06/02/2018.
@@ -102,10 +102,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         this.updateSpeed(null);
 
-        CheckBox chUseMetric = (CheckBox) this.findViewById(R.id.chMetricUnits);
-        chUseMetric.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        CheckBox chkUseMetricUnits = (CheckBox) this.findViewById(R.id.chkMetricUnits);
+        chkUseMetricUnits.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 MapActivity.this.updateSpeed(null);
             }
         });
@@ -161,7 +161,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         float nCurrentSpeed =0;
 
         if(location != null){
-            location.setUseMetricUnits(this.useMetricUnits());
+            location.setUseMetricunits(this.useMetricUnits());
             nCurrentSpeed = location.getSpeed();
         }
 
@@ -170,17 +170,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         String strCurrentSpeed = fmt.toString();
         strCurrentSpeed = strCurrentSpeed.replace(' ', '0');
 
-        String strUnits = "miles/hour";
+        String strUnits = "km/jam";
         if(this.useMetricUnits()){
-            strUnits = "meters/second";
+            strUnits = "meter/detik";
         }
         TextView txtCurrentSpeed = (TextView) this.findViewById(R.id.txtCurrentSpeed);
         txtCurrentSpeed.setText(strCurrentSpeed + " "+ strUnits);
     }
 
     private boolean useMetricUnits() {
-        CheckBox chUseMetricUnits = (CheckBox) this.findViewById(chMetricUnits);
-        return chUseMetricUnits.isChecked();
+        CheckBox chkUseMetricUnits = (CheckBox) this.findViewById(R.id.chkMetricUnits);
+        return chkUseMetricUnits.isChecked();
     }
 
     @Override

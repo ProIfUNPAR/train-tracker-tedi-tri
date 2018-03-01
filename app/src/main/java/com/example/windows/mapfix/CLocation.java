@@ -8,6 +8,25 @@ import android.location.Location;
 
 public class CLocation extends Location{
     private boolean bUseMetricUnits = false;
+
+    public CLocation(Location location){
+        this(location, true);
+    }
+
+    public CLocation(Location location, boolean bUseMetricUnits) {
+    super(location);
+    this.bUseMetricUnits=bUseMetricUnits;
+    }
+
+    public boolean getUseMetricUnits()
+    {
+        return this.bUseMetricUnits;
+    }
+    public void setUseMetricunits(boolean bUseMetricUnits)
+    {
+        this.bUseMetricUnits=bUseMetricUnits;
+    }
+
     @Override
     public float distanceTo(Location dest) {
         float nDistance = super.distanceTo(dest);
@@ -16,6 +35,16 @@ public class CLocation extends Location{
             nDistance = nDistance * 3.28083989501312f;
         }
         return nDistance;
+    }
+
+    @Override
+    public float getAccuracy() {
+        float nAccuracy =super.getAccuracy();
+        if(!this.getUseMetricUnits()){
+            //convert metric to feet
+            nAccuracy = nAccuracy * 3.28083989501312f;
+        }
+        return nAccuracy;
     }
 
     @Override
@@ -32,37 +61,10 @@ public class CLocation extends Location{
     public float getSpeed() {
         float nSpeed = super.getSpeed();
         if(!this.getUseMetricUnits()){
-            //convert meters/second to miles/hour
-            nSpeed =nSpeed*2.2369362920544f;
+            //convert meters/second to km/hour
+            nSpeed =nSpeed*3.6f;
 
         }
         return nSpeed;
     }
-
-    @Override
-    public float getAccuracy() {
-        float nAccuracy =super.getAccuracy();
-        if(!this.getUseMetricUnits()){
-            //convert metric to feet
-            nAccuracy = nAccuracy * 3.28083989501312f;
-        }
-        return nAccuracy;
-    }
-
-    public CLocation(Location location){
-        this(location, true);
-    }
-
-    public CLocation(Location location, boolean bUseMetricUnits) {
-    super(location);
-    this.bUseMetricUnits=bUseMetricUnits;
-    }
-
-    public boolean getUseMetricUnits(){
-        return this.bUseMetricUnits;
-    }
-    public void setUseMetricUnits(boolean b){
-        this.bUseMetricUnits=bUseMetricUnits;
-    }
-
 }
