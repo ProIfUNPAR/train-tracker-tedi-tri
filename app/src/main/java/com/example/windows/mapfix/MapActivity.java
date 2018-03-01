@@ -286,7 +286,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
             }
         });
-		
+
         /**stasiun[0]=new Stasiun("Stasiun Hall Bandung",-6.9146455,107.6023063,stationlocation);
         stasiun[1]=new Stasiun("Stasiun Ciroyom",-6.914000, 107.590145,stationlocation);
         stasiun[2]=new Stasiun("Stasiun Cimindi",-6.895880, 107.561183,stationlocation);
