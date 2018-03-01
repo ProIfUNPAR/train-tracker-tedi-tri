@@ -41,8 +41,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import java.io.UnsupportedEncodingException;
+import java.text.FieldPosition;
 import java.util.ArrayList;
 import java.util.Formatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -70,7 +72,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Location currentLocation;
     public Stasiun[] stasiun = new Stasiun[15];
     public Train[] Trains = new Train[5];
-
+    private HashMap<String, Stasiun> hash = new HashMap<String, Stasiun>();
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,10 +117,41 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         buttonrute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendRequest();
+                 findDistance(stasiun[0],stasiun[8]);
+                //sendRequest();
             }
         });
+
+
     }
+
+    public void findDistance(Stasiun origin, Stasiun destination){
+
+
+        Gmap.addMarker(new MarkerOptions()
+                .position(new LatLng(origin.getLatitude(),origin.getLongitude()))
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                .title("origin"));
+
+
+
+        Gmap.addMarker(new MarkerOptions()
+                .position(new LatLng(destination.getLatitude(),destination.getLongitude()))
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                .title("destination"));
+
+
+         Gmap.addPolyline(new PolylineOptions()
+                .add(new LatLng(origin.getLatitude(), origin.getLongitude()),(new LatLng(destination.getLatitude(),destination.getLongitude())))
+                .width(5)
+                .color(Color.RED));
+
+
+        double distance= Math.sqrt((Math.pow(destination.getLatitude(),2)-(Math.pow(origin.getLatitude(),2)))
+                        +(Math.pow(destination.getLongitude(),2)-(Math.pow(origin.getLongitude(),2))));
+        Log.d("distance =",distance+"");
+    }
+
     public void finish(){
         super.finish();
         System.exit(0);
@@ -225,7 +258,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         stasiun[7]=new Stasiun("Stasiun Cimahi", -6.885427, 107.536122,stationlocation);
         stasiun[8]=new Stasiun("Stasiun Cicalengka",  -6.981199, 107.832652,stationlocation);
         stasiun[9]=new Stasiun("stasiun rancaekek",-6.963572, 107.755793,stationlocation);
-
+        for(int i = 0;i<stasiun.length;i++){
+            hash.put(stasiun[i].getNama(), stasiun[i]);
+        }
 
         /////////////end init stasiun//////////////
 
@@ -416,7 +451,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     .title(route.startAddress)
                     .position(route.startLocation)));
             destinationMarkers.add(Gmap.addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
                     .title(route.endAddress)
                     .position(route.endLocation)));
 
