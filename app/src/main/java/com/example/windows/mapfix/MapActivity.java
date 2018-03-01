@@ -73,6 +73,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public Stasiun[] stasiun = new Stasiun[15];
     public Train[] Trains = new Train[5];
     private HashMap<String, Stasiun> hash = new HashMap<String, Stasiun>();
+	
+	DatabaseReference markerStasiun = FirebaseDatabase.getInstance().getReference().child("Stasiun");
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -248,7 +250,40 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         String stationlocation=location_provider.toString();
         ///////////////init stasiun////////////////
 
-        stasiun[0]=new Stasiun("Stasiun Hall Bandung",-6.9146455,107.6023063,stationlocation);
+		markerStasiun.addValueEventListener(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+                int i=0;
+                for(com.google.firebase.database.DataSnapshot ds : dataSnapshot.getChildren()) {
+                    String nama = ds.child("Nama").getValue(String.class);
+                    double latitude = ds.child("Latitude").getValue(Double.class);
+                    double longitude = ds.child("Longitude").getValue(Double.class);
+                    Log.d("nama",nama);
+                    Log.d("lat", String.valueOf(latitude));
+                    stasiun[i] = new Stasiun(nama, latitude, longitude, stationlocation);
+                    Log.d("Latitude", String.valueOf(stasiun[i].getLatitude()));
+                    Log.d("Latitude", String.valueOf(stasiun[i].getLatitude()));
+                    i++;
+                }
+
+                for (i = 0; i < stasiun.length; i++) {
+                    double latitude = stasiun[i].getLatitude();
+                    double longitude = stasiun[i].getLongitude();
+                    String nama = stasiun[i].getNama();
+                    Gmap.addMarker(new MarkerOptions()
+                            .position(new LatLng(latitude, longitude))
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                            .title(nama));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+		
+        /**stasiun[0]=new Stasiun("Stasiun Hall Bandung",-6.9146455,107.6023063,stationlocation);
         stasiun[1]=new Stasiun("Stasiun Ciroyom",-6.914000, 107.590145,stationlocation);
         stasiun[2]=new Stasiun("Stasiun Cimindi",-6.895880, 107.561183,stationlocation);
         stasiun[3]=new Stasiun("Stasiun Cikudapateuh", -6.918831, 107.625903,stationlocation);
@@ -260,16 +295,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         stasiun[9]=new Stasiun("stasiun rancaekek",-6.963572, 107.755793,stationlocation);
         for(int i = 0;i<stasiun.length;i++){
             hash.put(stasiun[i].getNama(), stasiun[i]);
-        }
+        }**/
 
         /////////////end init stasiun//////////////
 
         ////////////init kereta///////////////////
-        Trains[0]=new Train("patas bandung");
+        /**Trains[0]=new Train("patas bandung");
         Trains[0].addStasiun(stasiun[4]);
         Trains[0].addStasiun(stasiun[5]);
         Trains[0].addStasiun(stasiun[9]);
-        Trains[0].addStasiun(stasiun[8]);
+        Trains[0].addStasiun(stasiun[8]);**/
 
         /**for (int i = 0; i <Trains[0].stasiun.size()-1 ; i++) {
             Stasiun temp=Trains[0].getStop(i);

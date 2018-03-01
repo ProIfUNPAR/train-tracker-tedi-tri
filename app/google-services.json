@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "248775348989",
+    "firebase_url": "https://train-tracker-proif.firebaseio.com",
+    "project_id": "train-tracker-proif",
+    "storage_bucket": "train-tracker-proif.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:248775348989:android:2723d6cbdcc16166",
+        "android_client_info": {
+          "package_name": "com.example.windows.mapfix"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "248775348989-d3iailjdktdlsh5qcub6bimvn206bn42.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.windows.mapfix",
+            "certificate_hash": "1e50582e496b20d17a10ca86e074dcb08e632466"
+          }
+        },
+        {
+          "client_id": "248775348989-qn08erguomgd50q866ti0bpos47evhqp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4_tOTRbA-bRyxvCxznG0f0GHiRhf21F8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "248775348989-qn08erguomgd50q866ti0bpos47evhqp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
