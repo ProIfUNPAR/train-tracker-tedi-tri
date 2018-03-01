@@ -25,6 +25,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.client.DataSnapshot;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -39,6 +40,9 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -68,11 +72,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private List<Marker> destinationMarkers = new ArrayList<>();
     private List<Polyline> polylinePaths = new ArrayList<>();
     private Location currentLocation;
-    public Stasiun[] stasiun = new Stasiun[15];
+    public Stasiun[] stasiun = new Stasiun[9];
     public Train[] Trains = new Train[5];
+
+    DatabaseReference markerStasiun = FirebaseDatabase.getInstance().getReference().child("Stasiun");
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        //Firebase.setAndroidContext(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         getLocationPermission();
@@ -118,6 +125,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 sendRequest();
             }
         });
+
+
     }
     public void finish(){
         super.finish();
@@ -209,52 +218,43 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-
     private void initStation() {
         location_provider= LocationServices.getFusedLocationProviderClient(this);
-        String stationlocation=location_provider.toString();
-        ///////////////init stasiun////////////////
-
-        stasiun[0]=new Stasiun("Stasiun Hall Bandung",-6.9146455,107.6023063,stationlocation);
-        stasiun[1]=new Stasiun("Stasiun Ciroyom",-6.914000, 107.590145,stationlocation);
-        stasiun[2]=new Stasiun("Stasiun Cimindi",-6.895880, 107.561183,stationlocation);
-        stasiun[3]=new Stasiun("Stasiun Cikudapateuh", -6.918831, 107.625903,stationlocation);
-        stasiun[4]=new Stasiun("Stasiun Kiaracondong",-6.924929, 107.646303,stationlocation);
-        stasiun[5]=new Stasiun("Stasiun Gedebage", -6.940873, 107.689515,stationlocation);
-        stasiun[6]=new Stasiun("Stasiun Andir", -6.907938, 107.579256,stationlocation);
-        stasiun[7]=new Stasiun("Stasiun Cimahi", -6.885427, 107.536122,stationlocation);
-        stasiun[8]=new Stasiun("Stasiun Cicalengka",  -6.981199, 107.832652,stationlocation);
-        stasiun[9]=new Stasiun("stasiun rancaekek",-6.963572, 107.755793,stationlocation);
+        final String stationlocation=location_provider.toString();
 
 
-        /////////////end init stasiun//////////////
+        markerStasiun.addValueEventListener(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+                int i=0;
+                for(com.google.firebase.database.DataSnapshot ds : dataSnapshot.getChildren()) {
+                    String nama = ds.child("Nama").getValue(String.class);
+                    double latitude = ds.child("Latitude").getValue(Double.class);
+                    double longitude = ds.child("Longitude").getValue(Double.class);
+                    Log.d("nama",nama);
+                    Log.d("lat", String.valueOf(latitude));
+                    stasiun[i] = new Stasiun(nama, latitude, longitude, stationlocation);
+                    Log.d("Latitude", String.valueOf(stasiun[i].getLatitude()));
+                    Log.d("Latitude", String.valueOf(stasiun[i].getLatitude()));
+                    i++;
+                }
 
-        ////////////init kereta///////////////////
-        Trains[0]=new Train("patas bandung");
-        Trains[0].addStasiun(stasiun[4]);
-        Trains[0].addStasiun(stasiun[5]);
-        Trains[0].addStasiun(stasiun[9]);
-        Trains[0].addStasiun(stasiun[8]);
+                for (i = 0; i < stasiun.length; i++) {
+                    double latitude = stasiun[i].getLatitude();
+                    double longitude = stasiun[i].getLongitude();
+                    String nama = stasiun[i].getNama();
+                    Gmap.addMarker(new MarkerOptions()
+                            .position(new LatLng(latitude, longitude))
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                            .title(nama));
+                }
+            }
 
-        /**for (int i = 0; i <Trains[0].stasiun.size()-1 ; i++) {
-            Stasiun temp=Trains[0].getStop(i);
-            Gmap.addMarker(new MarkerOptions()
-                    .position(new LatLng(temp.getLatitude(),temp.getLongitude()))
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-                    .title(temp.getNama()));
-        }*/
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-
-
-
-        /////////////////////////////////////////
-
-      /**for (int i = 0; i <stasiun.length-1 ; i++) {
-            Gmap.addMarker(new MarkerOptions()
-                    .position(new LatLng(stasiun[i].getLatitude(), stasiun[i].getLongitude()))
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-                    .title(stasiun[i].getNama()));
-        }*/
+            }
+        });
 
     }
 
