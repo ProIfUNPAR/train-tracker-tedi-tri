@@ -48,7 +48,7 @@ public class Route {
     private String createUrl()throws UnsupportedEncodingException {
         String urlOrigin = URLEncoder.encode(origin, "utf-8");
         String urlDestination = URLEncoder.encode(destination, "utf-8");
-        return  DIRECTION_URL_API +"origin="+urlOrigin+"&destination="+urlDestination+"&mode=transit"+"&key=" + GOOGLE_API_KEY;
+        return  DIRECTION_URL_API +"origin="+urlOrigin+"&destination="+urlDestination+"&mode=transit"+"&transit_mode=train"+"&key=" + GOOGLE_API_KEY;
     }
 
 

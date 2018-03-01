@@ -45,12 +45,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.UnsupportedEncodingException;
+import java.text.FieldPosition;
 import java.util.ArrayList;
 import java.util.Formatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import static com.example.windows.mapfix.R.id.chMetricUnits;
+import static com.example.windows.mapfix.R.id.chkMetricUnits;
 
 /**
  * Created by Windows on 06/02/2018.
@@ -77,6 +79,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     DatabaseReference markerStasiun = FirebaseDatabase.getInstance().getReference().child("Stasiun");
 
+    private HashMap<String, Stasiun> hash = new HashMap<String, Stasiun>();
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         //Firebase.setAndroidContext(this);
@@ -107,10 +110,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         this.updateSpeed(null);
 
-        CheckBox chUseMetric = (CheckBox) this.findViewById(R.id.chMetricUnits);
-        chUseMetric.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        CheckBox chkUseMetricUnits = (CheckBox) this.findViewById(R.id.chkMetricUnits);
+        chkUseMetricUnits.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 MapActivity.this.updateSpeed(null);
             }
         });
@@ -122,12 +125,40 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         buttonrute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendRequest();
+                 findDistance(stasiun[0],stasiun[8]);
+                //sendRequest();
             }
         });
 
-
     }
+
+    public void findDistance(Stasiun origin, Stasiun destination){
+
+
+        Gmap.addMarker(new MarkerOptions()
+                .position(new LatLng(origin.getLatitude(),origin.getLongitude()))
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                .title("origin"));
+
+
+
+        Gmap.addMarker(new MarkerOptions()
+                .position(new LatLng(destination.getLatitude(),destination.getLongitude()))
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                .title("destination"));
+
+
+         Gmap.addPolyline(new PolylineOptions()
+                .add(new LatLng(origin.getLatitude(), origin.getLongitude()),(new LatLng(destination.getLatitude(),destination.getLongitude())))
+                .width(5)
+                .color(Color.RED));
+
+
+        double distance= Math.sqrt((Math.pow(destination.getLatitude(),2)-(Math.pow(origin.getLatitude(),2)))
+                        +(Math.pow(destination.getLongitude(),2)-(Math.pow(origin.getLongitude(),2))));
+        Log.d("distance =",distance+"");
+    }
+
     public void finish(){
         super.finish();
         System.exit(0);
@@ -137,7 +168,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         float nCurrentSpeed =0;
 
         if(location != null){
-            location.setUseMetricUnits(this.useMetricUnits());
+            location.setUseMetricunits(this.useMetricUnits());
             nCurrentSpeed = location.getSpeed();
         }
 
@@ -146,17 +177,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         String strCurrentSpeed = fmt.toString();
         strCurrentSpeed = strCurrentSpeed.replace(' ', '0');
 
-        String strUnits = "miles/hour";
+        String strUnits = "km/jam";
         if(this.useMetricUnits()){
-            strUnits = "meters/second";
+            strUnits = "meter/detik";
         }
         TextView txtCurrentSpeed = (TextView) this.findViewById(R.id.txtCurrentSpeed);
         txtCurrentSpeed.setText(strCurrentSpeed + " "+ strUnits);
     }
 
     private boolean useMetricUnits() {
-        CheckBox chUseMetricUnits = (CheckBox) this.findViewById(chMetricUnits);
-        return chUseMetricUnits.isChecked();
+        CheckBox chkUseMetricUnits = (CheckBox) this.findViewById(R.id.chkMetricUnits);
+        return chkUseMetricUnits.isChecked();
     }
 
     @Override
@@ -221,6 +252,38 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private void initStation() {
         location_provider= LocationServices.getFusedLocationProviderClient(this);
         final String stationlocation=location_provider.toString();
+        ///////////////init stasiun////////////////
+
+        /**stasiun[0]=new Stasiun("Stasiun Hall Bandung",-6.9146455,107.6023063,stationlocation);
+        stasiun[1]=new Stasiun("Stasiun Ciroyom",-6.914000, 107.590145,stationlocation);
+        stasiun[2]=new Stasiun("Stasiun Cimindi",-6.895880, 107.561183,stationlocation);
+        stasiun[3]=new Stasiun("Stasiun Cikudapateuh", -6.918831, 107.625903,stationlocation);
+        stasiun[4]=new Stasiun("Stasiun Kiaracondong",-6.924929, 107.646303,stationlocation);
+        stasiun[5]=new Stasiun("Stasiun Gedebage", -6.940873, 107.689515,stationlocation);
+        stasiun[6]=new Stasiun("Stasiun Andir", -6.907938, 107.579256,stationlocation);
+        stasiun[7]=new Stasiun("Stasiun Cimahi", -6.885427, 107.536122,stationlocation);
+        stasiun[8]=new Stasiun("Stasiun Cicalengka",  -6.981199, 107.832652,stationlocation);
+        stasiun[9]=new Stasiun("stasiun rancaekek",-6.963572, 107.755793,stationlocation);
+        for(int i = 0;i<stasiun.length;i++){
+            hash.put(stasiun[i].getNama(), stasiun[i]);
+        }
+
+        /////////////end init stasiun//////////////
+
+        ////////////init kereta///////////////////
+        Trains[0]=new Train("patas bandung");
+        Trains[0].addStasiun(stasiun[4]);
+        Trains[0].addStasiun(stasiun[5]);
+        Trains[0].addStasiun(stasiun[9]);
+        Trains[0].addStasiun(stasiun[8]);
+
+        /**for (int i = 0; i <Trains[0].stasiun.size()-1 ; i++) {
+            Stasiun temp=Trains[0].getStop(i);
+            Gmap.addMarker(new MarkerOptions()
+                    .position(new LatLng(temp.getLatitude(),temp.getLongitude()))
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                    .title(temp.getNama()));
+        }*/
 
 
         markerStasiun.addValueEventListener(new com.google.firebase.database.ValueEventListener() {
@@ -416,7 +479,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     .title(route.startAddress)
                     .position(route.startLocation)));
             destinationMarkers.add(Gmap.addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
                     .title(route.endAddress)
                     .position(route.endLocation)));
 

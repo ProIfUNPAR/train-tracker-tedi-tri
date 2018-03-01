@@ -1,14 +1,14 @@
 <resources>
     <string name="app_name">mapfix</string>
     <string-array name="station">
-        <item>Stasiun Bandung (St.Hall)</item>
-        <item>Stasiun Ciroyom (CIR)</item>
-        <item>Stasiun Andir (AND)</item>
-        <item>Stasiun Cimindi (CMD)</item>
-        <item>Stasiun Cikudapateuh (CTH)</item>
-        <item>Stasiun Kiaracondong (KAC)</item>
-        <item>Stasiun Gedebage (GDB)</item>
-        <item>Universitas Katolik Parahyangan</item>
+        <item>Stasiun Bandung</item>
+        <item>Stasiun Ciroyom</item>
+        <item>Stasiun Andir</item>
+        <item>Stasiun Cimindi</item>
+        <item>Stasiun Cikudapateuh</item>
+        <item>Stasiun Kiaracondong</item>
+        <item>Stasiun Gedebage</item>
+        <item>Stasiun Cicalengka</item>
         <item>Cihampelas Walk</item>
     </string-array>
 
