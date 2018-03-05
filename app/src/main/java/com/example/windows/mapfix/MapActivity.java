@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static com.example.windows.mapfix.R.id.chkMetricUnits;
+import static com.example.windows.mapfix.R.id.logo_only;
 
 /**
  * Created by Windows on 06/02/2018.
@@ -74,15 +75,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private List<Marker> destinationMarkers = new ArrayList<>();
     private List<Polyline> polylinePaths = new ArrayList<>();
     private Location currentLocation;
-    public Stasiun[] stasiun = new Stasiun[9];
+    public Stasiun[] stasiun = new Stasiun[13];
     public Train[] Trains = new Train[5];
 
     private HashMap<String, Stasiun> hash = new HashMap<String, Stasiun>();
 	
 	DatabaseReference markerStasiun = FirebaseDatabase.getInstance().getReference().child("Stasiun");
+    DatabaseReference markerKereta = FirebaseDatabase.getInstance().getReference().child("Kereta");
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         //Firebase.setAndroidContext(this);
+        initData();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         getLocationPermission();
@@ -125,27 +128,38 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         buttonrute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                 findDistance(stasiun[0],stasiun[8]);
-                //sendRequest();
+                doTrip(0,4);
+                //sendRequest(Stasiun origin, Stasiun destination);
             }
         });
 
     }
 
-    public void findDistance(Stasiun origin, Stasiun destination){
+    private void doTrip(int start, int stop) {
+        int count= stop-start;
+        double totaldistance=0;
+        for (int i = start; i < count; i++) {
+            findPath(Trains[0].getStop(i),Trains[0].getStop(i+1));
+            Log.d(TAG, "doTrip: cari path dari "+Trains[0].getStop(i).getNama() + " "+i+" "+Trains[0].getStop(i+1).getNama()+" "+(i+1) );
+            totaldistance += findDistance(Trains[0].getStop(i),Trains[0].getStop(i+1));
+        }
+        Toast.makeText(this,"total distance : "+ totaldistance,Toast.LENGTH_SHORT).show();
+    }
+
+    public void findPath(Stasiun origin, Stasiun destination){
 
 
         Gmap.addMarker(new MarkerOptions()
                 .position(new LatLng(origin.getLatitude(),origin.getLongitude()))
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-                .title("origin"));
+                .title(origin.getNama()));
 
 
 
         Gmap.addMarker(new MarkerOptions()
                 .position(new LatLng(destination.getLatitude(),destination.getLongitude()))
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-                .title("destination"));
+                .title(destination.getNama()));
 
 
          Gmap.addPolyline(new PolylineOptions()
@@ -154,11 +168,21 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 .color(Color.RED));
 
 
-        double distance= Math.sqrt((Math.pow(destination.getLatitude(),2)-(Math.pow(origin.getLatitude(),2)))
-                        +(Math.pow(destination.getLongitude(),2)-(Math.pow(origin.getLongitude(),2))));
-        Log.d("distance =",distance+"");
+
     }
 
+    private double findDistance(Stasiun origin, Stasiun destination){
+        String provider = location_provider.toString();
+        Location curr=new Location("provider");
+        curr.setLatitude(origin.getLatitude());
+        curr.setLongitude(origin.getLongitude());
+
+        Location dest = new Location("provider");
+        dest.setLatitude(destination.getLatitude());
+        dest.setLongitude(destination.getLongitude());
+
+        return curr.distanceTo(dest);
+    }
     public void finish(){
         super.finish();
         System.exit(0);
@@ -249,25 +273,26 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    private void initStation() {
-        location_provider= LocationServices.getFusedLocationProviderClient(this);
-        final String stationlocation=location_provider.toString();
+    private void initData() {
+        location_provider = LocationServices.getFusedLocationProviderClient(this);
+        final String stationlocation = location_provider.toString();
         ///////////////init stasiun////////////////
 
-		markerStasiun.addValueEventListener(new com.google.firebase.database.ValueEventListener() {
+        markerStasiun.addValueEventListener(new com.google.firebase.database.ValueEventListener() {
             @Override
             public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
-                int i=0;
-                for(com.google.firebase.database.DataSnapshot ds : dataSnapshot.getChildren()) {
+                int i = 0;
+                for (com.google.firebase.database.DataSnapshot ds : dataSnapshot.getChildren()) {
                     String nama = ds.child("Nama").getValue(String.class);
                     double latitude = ds.child("Latitude").getValue(Double.class);
                     double longitude = ds.child("Longitude").getValue(Double.class);
-                    Log.d("nama",nama);
+                    Log.d("nama", nama);
                     Log.d("lat", String.valueOf(latitude));
                     stasiun[i] = new Stasiun(nama, latitude, longitude, stationlocation);
                     Log.d("Latitude", String.valueOf(stasiun[i].getLatitude()));
                     Log.d("Latitude", String.valueOf(stasiun[i].getLatitude()));
                     i++;
+                    Log.d(TAG, "array ke : "+i+" "+nama);
                 }
 
                 for (i = 0; i < stasiun.length; i++) {
@@ -279,6 +304,48 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
                             .title(nama));
                 }
+                initKereta();
+            }
+
+
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void initKereta() {
+
+        markerKereta.addValueEventListener(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+
+                for(com.google.firebase.database.DataSnapshot ds : dataSnapshot.getChildren()) {
+                    Integer x=1;
+                    Integer temp=0;
+                    Integer y=0;
+
+                    String nama = ds.child("Nama").getValue(String.class);
+                    long childCount=ds.getChildrenCount();
+                    Trains[y]=new Train(nama);
+
+                    for (int j = 0; j < childCount-1; j++) {
+                        String xString = x + "";
+                        temp=ds.child("Stasiun"+xString).getValue(Integer.class);
+                        Trains[y].addStasiun(stasiun[temp]);
+
+                        Log.d(TAG, "Stasiun : "+ stasiun[temp].getNama()+" ditambahkan ke "+Trains[y].getNama());
+                        Log.d(TAG, "onDataChange: "+ds.child("Stasiun"+xString).getValue(Integer.class));
+                        x++;
+
+                    }
+                y++;
+
+                }
+
+
             }
 
             @Override
@@ -317,41 +384,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
                     .title(temp.getNama()));
         }*/
-
-
-        markerStasiun.addValueEventListener(new com.google.firebase.database.ValueEventListener() {
-            @Override
-            public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
-                int i=0;
-                for(com.google.firebase.database.DataSnapshot ds : dataSnapshot.getChildren()) {
-                    String nama = ds.child("Nama").getValue(String.class);
-                    double latitude = ds.child("Latitude").getValue(Double.class);
-                    double longitude = ds.child("Longitude").getValue(Double.class);
-                    Log.d("nama",nama);
-                    Log.d("lat", String.valueOf(latitude));
-                    stasiun[i] = new Stasiun(nama, latitude, longitude, stationlocation);
-                    Log.d("Latitude", String.valueOf(stasiun[i].getLatitude()));
-                    Log.d("Latitude", String.valueOf(stasiun[i].getLatitude()));
-                    i++;
-                }
-
-                for (i = 0; i < stasiun.length; i++) {
-                    double latitude = stasiun[i].getLatitude();
-                    double longitude = stasiun[i].getLongitude();
-                    String nama = stasiun[i].getNama();
-                    Gmap.addMarker(new MarkerOptions()
-                            .position(new LatLng(latitude, longitude))
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-                            .title(nama));
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
     }
 
     private void sendRequest(){
@@ -369,10 +401,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void getDeviceLocation(){
         Log.d(TAG, "getDeviceLocation: get current location");
-
-
         location_provider= LocationServices.getFusedLocationProviderClient(this);
-
         try{
             if(locPermission){
                 Task location=location_provider.getLastLocation();
@@ -384,7 +413,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             currentLocation=(Location)task.getResult();
                             if(currentLocation!=null) {
                                 Gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 15f));
-                                initStation();
+
                             }
                             else{
                                 Toast.makeText(getApplicationContext(),"cannot found location",Toast.LENGTH_LONG).show();
@@ -402,6 +431,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
    }
 
 
+
+
     /**private void moveCamera(LatLng latLng, float zoom){
         Log.d(TAG, "moveCamera: camera move to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
         Gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
@@ -409,10 +440,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void initMap(){
         SupportMapFragment mapFragment= (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-
         mapFragment.getMapAsync(MapActivity.this);
-
-
+        initData();
     }
 
     private void getLocationPermission(){
