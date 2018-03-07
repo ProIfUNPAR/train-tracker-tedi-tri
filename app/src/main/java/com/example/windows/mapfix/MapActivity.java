@@ -133,7 +133,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         Formatter fmt = new Formatter(new StringBuilder());
-        fmt.format(Locale.US, "%5.1f", nCurrentSpeed);
+        fmt.format(Locale.UK, "%5.1f", nCurrentSpeed);
         String strCurrentSpeed = fmt.toString();
         strCurrentSpeed = strCurrentSpeed.replace(' ', '0');
 
