@@ -25,6 +25,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.client.DataSnapshot;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -39,14 +40,20 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.UnsupportedEncodingException;
+import java.text.FieldPosition;
 import java.util.ArrayList;
 import java.util.Formatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
 import static com.example.windows.mapfix.R.id.chkMetricUnits;
+import static com.example.windows.mapfix.R.id.logo_only;
 
 /**
  * Created by Windows on 06/02/2018.
@@ -68,11 +75,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private List<Marker> destinationMarkers = new ArrayList<>();
     private List<Polyline> polylinePaths = new ArrayList<>();
     private Location currentLocation;
-    public Stasiun[] stasiun = new Stasiun[15];
+    public Stasiun[] stasiun = new Stasiun[13];
     public Train[] Trains = new Train[5];
 
+    private HashMap<String, Stasiun> hash = new HashMap<String, Stasiun>();
+	
+	DatabaseReference markerStasiun = FirebaseDatabase.getInstance().getReference().child("Stasiun");
+    DatabaseReference markerKereta = FirebaseDatabase.getInstance().getReference().child("Kereta");
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        //Firebase.setAndroidContext(this);
+        initData();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         getLocationPermission();
@@ -115,9 +128,60 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         buttonrute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendRequest();
+                doTrip(0,4);
+                //sendRequest(Stasiun origin, Stasiun destination);
             }
         });
+
+    }
+
+    private void doTrip(int start, int stop) {
+        int count= stop-start;
+        double totaldistance=0;
+        for (int i = start; i < count; i++) {
+            findPath(Trains[0].getStop(i),Trains[0].getStop(i+1));
+            Log.d(TAG, "doTrip: cari path dari "+Trains[0].getStop(i).getNama() + " "+i+" "+Trains[0].getStop(i+1).getNama()+" "+(i+1) );
+            totaldistance += findDistance(Trains[0].getStop(i),Trains[0].getStop(i+1));
+        }
+        Toast.makeText(this,"total distance : "+ totaldistance,Toast.LENGTH_SHORT).show();
+    }
+
+    public void findPath(Stasiun origin, Stasiun destination){
+
+
+        Gmap.addMarker(new MarkerOptions()
+                .position(new LatLng(origin.getLatitude(),origin.getLongitude()))
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                .title(origin.getNama()));
+
+
+
+        Gmap.addMarker(new MarkerOptions()
+                .position(new LatLng(destination.getLatitude(),destination.getLongitude()))
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                .title(destination.getNama()));
+
+
+         Gmap.addPolyline(new PolylineOptions()
+                .add(new LatLng(origin.getLatitude(), origin.getLongitude()),(new LatLng(destination.getLatitude(),destination.getLongitude())))
+                .width(5)
+                .color(Color.RED));
+
+
+
+    }
+
+    private double findDistance(Stasiun origin, Stasiun destination){
+        String provider = location_provider.toString();
+        Location curr=new Location("provider");
+        curr.setLatitude(origin.getLatitude());
+        curr.setLongitude(origin.getLongitude());
+
+        Location dest = new Location("provider");
+        dest.setLatitude(destination.getLatitude());
+        dest.setLongitude(destination.getLongitude());
+
+        return curr.distanceTo(dest);
     }
     public void finish(){
         super.finish();
@@ -209,13 +273,88 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-
-    private void initStation() {
-        location_provider= LocationServices.getFusedLocationProviderClient(this);
-        String stationlocation=location_provider.toString();
+    private void initData() {
+        location_provider = LocationServices.getFusedLocationProviderClient(this);
+        final String stationlocation = location_provider.toString();
         ///////////////init stasiun////////////////
 
-        stasiun[0]=new Stasiun("Stasiun Hall Bandung",-6.9146455,107.6023063,stationlocation);
+        markerStasiun.addValueEventListener(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+                int i = 0;
+                for (com.google.firebase.database.DataSnapshot ds : dataSnapshot.getChildren()) {
+                    String nama = ds.child("Nama").getValue(String.class);
+                    double latitude = ds.child("Latitude").getValue(Double.class);
+                    double longitude = ds.child("Longitude").getValue(Double.class);
+                    Log.d("nama", nama);
+                    Log.d("lat", String.valueOf(latitude));
+                    stasiun[i] = new Stasiun(nama, latitude, longitude, stationlocation);
+                    Log.d("Latitude", String.valueOf(stasiun[i].getLatitude()));
+                    Log.d("Latitude", String.valueOf(stasiun[i].getLatitude()));
+                    i++;
+                    Log.d(TAG, "array ke : "+i+" "+nama);
+                }
+
+                for (i = 0; i < stasiun.length; i++) {
+                    double latitude = stasiun[i].getLatitude();
+                    double longitude = stasiun[i].getLongitude();
+                    String nama = stasiun[i].getNama();
+                    Gmap.addMarker(new MarkerOptions()
+                            .position(new LatLng(latitude, longitude))
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                            .title(nama));
+                }
+                initKereta();
+            }
+
+
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void initKereta() {
+
+        markerKereta.addValueEventListener(new com.google.firebase.database.ValueEventListener() {
+            @Override
+            public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
+
+                for(com.google.firebase.database.DataSnapshot ds : dataSnapshot.getChildren()) {
+                    Integer x=1;
+                    Integer temp=0;
+                    Integer y=0;
+
+                    String nama = ds.child("Nama").getValue(String.class);
+                    long childCount=ds.getChildrenCount();
+                    Trains[y]=new Train(nama);
+
+                    for (int j = 0; j < childCount-1; j++) {
+                        String xString = x + "";
+                        temp=ds.child("Stasiun"+xString).getValue(Integer.class);
+                        Trains[y].addStasiun(stasiun[temp]);
+
+                        Log.d(TAG, "Stasiun : "+ stasiun[temp].getNama()+" ditambahkan ke "+Trains[y].getNama());
+                        Log.d(TAG, "onDataChange: "+ds.child("Stasiun"+xString).getValue(Integer.class));
+                        x++;
+
+                    }
+                y++;
+
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        /**stasiun[0]=new Stasiun("Stasiun Hall Bandung",-6.9146455,107.6023063,stationlocation);
         stasiun[1]=new Stasiun("Stasiun Ciroyom",-6.914000, 107.590145,stationlocation);
         stasiun[2]=new Stasiun("Stasiun Cimindi",-6.895880, 107.561183,stationlocation);
         stasiun[3]=new Stasiun("Stasiun Cikudapateuh", -6.918831, 107.625903,stationlocation);
@@ -225,16 +364,18 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         stasiun[7]=new Stasiun("Stasiun Cimahi", -6.885427, 107.536122,stationlocation);
         stasiun[8]=new Stasiun("Stasiun Cicalengka",  -6.981199, 107.832652,stationlocation);
         stasiun[9]=new Stasiun("stasiun rancaekek",-6.963572, 107.755793,stationlocation);
-
+        for(int i = 0;i<stasiun.length;i++){
+            hash.put(stasiun[i].getNama(), stasiun[i]);
+        }**/
 
         /////////////end init stasiun//////////////
 
         ////////////init kereta///////////////////
-        Trains[0]=new Train("patas bandung");
+        /**Trains[0]=new Train("patas bandung");
         Trains[0].addStasiun(stasiun[4]);
         Trains[0].addStasiun(stasiun[5]);
         Trains[0].addStasiun(stasiun[9]);
-        Trains[0].addStasiun(stasiun[8]);
+        Trains[0].addStasiun(stasiun[8]);**/
 
         /**for (int i = 0; i <Trains[0].stasiun.size()-1 ; i++) {
             Stasiun temp=Trains[0].getStop(i);
@@ -243,19 +384,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
                     .title(temp.getNama()));
         }*/
-
-
-
-
-        /////////////////////////////////////////
-
-      /**for (int i = 0; i <stasiun.length-1 ; i++) {
-            Gmap.addMarker(new MarkerOptions()
-                    .position(new LatLng(stasiun[i].getLatitude(), stasiun[i].getLongitude()))
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-                    .title(stasiun[i].getNama()));
-        }*/
-
     }
 
     private void sendRequest(){
@@ -273,10 +401,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void getDeviceLocation(){
         Log.d(TAG, "getDeviceLocation: get current location");
-
-
         location_provider= LocationServices.getFusedLocationProviderClient(this);
-
         try{
             if(locPermission){
                 Task location=location_provider.getLastLocation();
@@ -288,7 +413,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             currentLocation=(Location)task.getResult();
                             if(currentLocation!=null) {
                                 Gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 15f));
-                                initStation();
+
                             }
                             else{
                                 Toast.makeText(getApplicationContext(),"cannot found location",Toast.LENGTH_LONG).show();
@@ -306,6 +431,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
    }
 
 
+
+
     /**private void moveCamera(LatLng latLng, float zoom){
         Log.d(TAG, "moveCamera: camera move to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
         Gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
@@ -313,10 +440,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void initMap(){
         SupportMapFragment mapFragment= (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-
         mapFragment.getMapAsync(MapActivity.this);
-
-
+        initData();
     }
 
     private void getLocationPermission(){
@@ -416,7 +541,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     .title(route.startAddress)
                     .position(route.startLocation)));
             destinationMarkers.add(Gmap.addMarker(new MarkerOptions()
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
                     .title(route.endAddress)
                     .position(route.endLocation)));
 
