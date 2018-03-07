@@ -21,7 +21,7 @@
             />
 
         <Spinner
-            android:id="@+id/your_position"
+            android:id="@+id/your_train"
             android:layout_width="130pt"
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"/>
@@ -32,15 +32,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="#FFF68F"
-        android:gravity="right">
+        android:background="#FFF68F">
 
-        <ImageButton
-            android:layout_width="20pt"
-            android:layout_height="20pt"
-            android:src="@android:drawable/ic_menu_rotate"/>
+        <ImageView
+            android:layout_height="15pt"
+            android:layout_width="15pt"
+            android:layout_marginLeft="10pt"
+            android:layout_marginTop="10pt"
+            android:layout_marginRight="5pt"
+            android:background="#940000"
+            />
 
-
+        <Spinner
+            android:id="@+id/your_position"
+            android:layout_width="130pt"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"/>
     </LinearLayout>
 
     <LinearLayout

@@ -84,7 +84,7 @@ public class TrackService extends Service
     {
         Log.e(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     @Override

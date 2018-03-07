@@ -16,6 +16,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -68,6 +69,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private boolean locPermission = false;
     private GoogleMap Gmap;
     private FusedLocationProviderClient location_provider;
+    private Spinner your_train;
     private Spinner your_position;
     private Spinner your_destination;
     private Button buttonrute;
@@ -75,7 +77,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private List<Marker> destinationMarkers = new ArrayList<>();
     private List<Polyline> polylinePaths = new ArrayList<>();
     private Location currentLocation;
-    public Stasiun[] stasiun = new Stasiun[13];
+    public Stasiun[] stasiun = new Stasiun[36];
     public Train[] Trains = new Train[5];
 
     private HashMap<String, Stasiun> hash = new HashMap<String, Stasiun>();
@@ -121,31 +123,77 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         });
 
-        addItemsOnSpinner1();
+
+        your_train = (Spinner) findViewById(R.id.your_train);
+        your_train.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                                 @Override
+                                                 public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                                                     addItemStasiun(your_train.getSelectedItemPosition());
+                                                 }
+
+                                                 @Override
+                                                 public void onNothingSelected(AdapterView<?> adapterView) {
+
+                                                 }
+
+                                             });
         your_position = (Spinner) findViewById(R.id.your_position);
         your_destination = (Spinner) findViewById(R.id.your_destination);
         buttonrute = (Button) findViewById(R.id.buttonrute);
         buttonrute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                doTrip(0,4);
+                doTrip(your_position.getSelectedItemPosition(),your_destination.getSelectedItemPosition(),your_train.getSelectedItemPosition());
                 //sendRequest(Stasiun origin, Stasiun destination);
             }
         });
 
+
     }
 
-    private void doTrip(int start, int stop) {
+    //@Override
+    //public void onWindowFocusChanged(boolean hasFocus){
+      public void initSpinner(){
+        //super.onWindowFocusChanged(hasFocus);
+        //if(hasFocus){
+            //this.addItemsOnSpinner1();
+
+            this.addItemKereta();
+            this.addItemStasiun(0);
+        //}
+    }
+
+    private void doTrip(int start, int stop,int index) {
+        Gmap.clear();
+
         int count= stop-start;
+        double speed = 12.5;
+        double eta = 0;
+        double etaH = 0;
+        double etaM = 0;
         double totaldistance=0;
         for (int i = start; i < count; i++) {
-            findPath(Trains[0].getStop(i),Trains[0].getStop(i+1));
-            Log.d(TAG, "doTrip: cari path dari "+Trains[0].getStop(i).getNama() + " "+i+" "+Trains[0].getStop(i+1).getNama()+" "+(i+1) );
-            totaldistance += findDistance(Trains[0].getStop(i),Trains[0].getStop(i+1));
-        }
-        Toast.makeText(this,"total distance : "+ totaldistance,Toast.LENGTH_SHORT).show();
-    }
+            findPath(Trains[index].getStop(i),Trains[index].getStop(i+1));
+            addMarker(Trains[index].getStop(i));
+            Log.d(TAG, "doTrip: cari path dari "+Trains[index].getStop(i).getNama() + " "+i+" "+Trains[index].getStop(i+1).getNama()+" "+(i+1) );
+            totaldistance += findDistance(Trains[index].getStop(i),Trains[index].getStop(i+1));
 
+        }
+        double totalDistanceKM = Math.floor(totaldistance/1000);
+        Toast.makeText(this,"total distance : "+ totalDistanceKM + " KM",Toast.LENGTH_SHORT).show();
+        eta = totaldistance/12.5;
+        etaH = eta/3600;
+        etaH = Math.floor(etaH);
+        etaM = (eta%3600)/60;
+        etaM = Math.floor(etaM);
+        Toast.makeText(this,"estimated time of arrival " + etaH +" jam " + etaM + " menit",Toast.LENGTH_SHORT).show();
+    }
+    public void addMarker(Stasiun st){
+        Gmap.addMarker(new MarkerOptions()
+                .position(new LatLng(st.getLatitude(), st.getLongitude()))
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                .title(st.getNama()));
+    }
     public void findPath(Stasiun origin, Stasiun destination){
 
 
@@ -299,10 +347,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     double latitude = stasiun[i].getLatitude();
                     double longitude = stasiun[i].getLongitude();
                     String nama = stasiun[i].getNama();
-                    Gmap.addMarker(new MarkerOptions()
-                            .position(new LatLng(latitude, longitude))
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-                            .title(nama));
+
                 }
                 initKereta();
             }
@@ -321,30 +366,31 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         markerKereta.addValueEventListener(new com.google.firebase.database.ValueEventListener() {
             @Override
             public void onDataChange(com.google.firebase.database.DataSnapshot dataSnapshot) {
-
+                int mark=0;
                 for(com.google.firebase.database.DataSnapshot ds : dataSnapshot.getChildren()) {
                     Integer x=1;
                     Integer temp=0;
-                    Integer y=0;
+
 
                     String nama = ds.child("Nama").getValue(String.class);
                     long childCount=ds.getChildrenCount();
-                    Trains[y]=new Train(nama);
+                    Log.d("asddasdas", childCount +"" );
+                    Trains[mark]=new Train(nama);
 
                     for (int j = 0; j < childCount-1; j++) {
                         String xString = x + "";
                         temp=ds.child("Stasiun"+xString).getValue(Integer.class);
-                        Trains[y].addStasiun(stasiun[temp]);
+                        Trains[mark].addStasiun(stasiun[temp]);
 
-                        Log.d(TAG, "Stasiun : "+ stasiun[temp].getNama()+" ditambahkan ke "+Trains[y].getNama());
+                        Log.d(TAG, "Stasiun : "+ stasiun[temp].getNama()+" ditambahkan ke "+Trains[mark].getNama()+ " "+ mark);
                         Log.d(TAG, "onDataChange: "+ds.child("Stasiun"+xString).getValue(Integer.class));
                         x++;
 
                     }
-                y++;
+                mark++;
 
                 }
-
+                initSpinner();
 
             }
 
@@ -491,14 +537,54 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     public void addItemsOnSpinner1() {
         this.firstPos = findViewById(R.id.your_position);
-        ArrayAdapter<CharSequence> firstPosition = ArrayAdapter.createFromResource(this, R.array.station, android.R.layout.simple_spinner_item);
-        firstPosition.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        this.desPos = findViewById(R.id.your_destination);
+        String[] namaStasiun = null;
+        for (int i=0; i<Trains.length; i++){
+            if (i==your_train.getSelectedItemPosition()){
+                namaStasiun=new String[Trains[i].getStasiun().size()];
+                for (int j=0; j<Trains[i].getStasiun().size(); j++){
+                    namaStasiun[j]=Trains[i].getStop(j).getNama();
+                }
+            }
+        }
+        ArrayAdapter<String> firstPosition = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, namaStasiun);
         this.firstPos.setAdapter(firstPosition);
 
-        this.desPos = findViewById(R.id.your_destination);
-        ArrayAdapter<CharSequence> destinationPosition = ArrayAdapter.createFromResource(this, R.array.station, android.R.layout.simple_spinner_item);
-        destinationPosition.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<String> destinationPosition = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, namaStasiun);
         this.desPos.setAdapter(destinationPosition);
+    }
+
+    public void addItemKereta() {
+        this.your_train = findViewById(R.id.your_train);
+        String[] namaKereta=new String[2];
+        if (namaKereta==null){
+            Log.d("Trains", "null");
+            addItemKereta();
+        }
+        else {
+            for(int i=0; i<namaKereta.length; i++){
+                namaKereta[i]=Trains[i].getNama();
+                Log.d("Train"+i, Trains[i].getNama()+"");
+            }
+        }
+        ArrayAdapter<String> trainList = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, namaKereta);
+        this.your_train.setAdapter(trainList);
+    }
+
+    public void addItemStasiun(int index) {
+        this.your_position = findViewById(R.id.your_position);
+        this.your_destination=findViewById(R.id.your_destination);
+
+        String[] namaStasiun=new String[Trains[index].getStasiun().size()];
+
+            for(int i=0; i<Trains[index].getStasiun().size(); i++){
+                namaStasiun[i]=Trains[index].getStop(i).getNama();
+                Log.d("Train spinner"+i, Trains[index].getStop(i).getNama()+"");
+            }
+
+        ArrayAdapter<String> trainList = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, namaStasiun);
+        this.your_position.setAdapter(trainList);
+        this.your_destination.setAdapter(trainList);
     }
 
     @Override
