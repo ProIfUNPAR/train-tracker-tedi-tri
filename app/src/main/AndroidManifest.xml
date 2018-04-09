@@ -24,14 +24,18 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyA95S-tjZmLFdiZfFDTTmgPfStqQzRpLXs"/>
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".MainActivity"/>
+
         <activity android:name=".MapActivity"/>
+
         <service android:name=".TrackService" android:process=":track_service" />
     </application>
 
