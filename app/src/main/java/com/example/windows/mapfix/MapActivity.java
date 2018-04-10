@@ -77,7 +77,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private List<Marker> destinationMarkers = new ArrayList<>();
     private List<Polyline> polylinePaths = new ArrayList<>();
     private Location currentLocation;
-    public Stasiun[] stasiun = new Stasiun[36];
+    public Stasiun[] stasiun = new Stasiun[97];
     public Train[] Trains = new Train[5];
 
     private HashMap<String, Stasiun> hash = new HashMap<String, Stasiun>();
