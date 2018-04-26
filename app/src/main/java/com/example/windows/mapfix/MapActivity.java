@@ -26,6 +26,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.windows.mapfix.java.time.Stops;
 import com.firebase.client.DataSnapshot;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -77,8 +78,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private List<Marker> destinationMarkers = new ArrayList<>();
     private List<Polyline> polylinePaths = new ArrayList<>();
     private Location currentLocation;
-    public Stasiun[] stasiun = new Stasiun[36];
-    public Train[] Trains = new Train[5];
+    public Stasiun[] stasiun = new Stasiun[97];
+    public Train[] Trains = new Train[20];
 
     private HashMap<String, Stasiun> hash = new HashMap<String, Stasiun>();
 	
@@ -87,7 +88,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         //Firebase.setAndroidContext(this);
-        initData();
+        //initData();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         getLocationPermission();
@@ -165,9 +166,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void doTrip(int start, int stop,int index) {
         Gmap.clear();
-
+        ArrayList <Stops> next_stop = new ArrayList();
+        double tempDistance = 0;
         int count= stop-start;
         double speed = 12.5;
+        double tempETA = 0;
         double eta = 0;
         double etaH = 0;
         double etaM = 0;
@@ -176,12 +179,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             findPath(Trains[index].getStop(i),Trains[index].getStop(i+1));
             addMarker(Trains[index].getStop(i));
             Log.d(TAG, "doTrip: cari path dari "+Trains[index].getStop(i).getNama() + " "+i+" "+Trains[index].getStop(i+1).getNama()+" "+(i+1) );
-            totaldistance += findDistance(Trains[index].getStop(i),Trains[index].getStop(i+1));
-
+            tempDistance = findDistance(Trains[index].getStop(i),Trains[index].getStop(i+1));
+            totaldistance += tempDistance;
+            tempETA = tempDistance/speed;
+            next_stop.add(new Stops(Trains[index].getStop(i+1), tempDistance, tempETA));
+            tempDistance = 0;
+            tempETA = 0;
         }
         double totalDistanceKM = Math.floor(totaldistance/1000);
         Toast.makeText(this,"total distance : "+ totalDistanceKM + " KM",Toast.LENGTH_SHORT).show();
-        eta = totaldistance/12.5;
+        eta = totaldistance/speed;
         etaH = eta/3600;
         etaH = Math.floor(etaH);
         etaM = (eta%3600)/60;
@@ -487,7 +494,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private void initMap(){
         SupportMapFragment mapFragment= (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(MapActivity.this);
-        initData();
+        //initData();
     }
 
     private void getLocationPermission(){

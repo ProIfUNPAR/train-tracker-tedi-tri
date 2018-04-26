@@ -20,7 +20,7 @@ public class TrackService extends Service
 {
     private static final String TAG = "Location_Update_Service";
     private LocationManager mLocationManager = null;
-    private static final int LOCATION_INTERVAL = 1000;
+    private static final int LOCATION_INTERVAL = 5000;
     private static final float LOCATION_DISTANCE = 1f;
     GoogleMap Gmap;
 
@@ -37,17 +37,18 @@ public class TrackService extends Service
         }
 
         @Override
-        public void onLocationChanged(Location location)
-        {
-            Log.e(TAG, "onLocationChanged: " + location);
-            Toast.makeText(getApplicationContext(),"location changed", Toast.LENGTH_SHORT).show();
-            LastLocation.set(location);
-            
-            //Gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(LastLocation.getLatitude(), LastLocation.getLongitude()), 15f));
-            // Log.d(TAG, "onLocationChanged: camera following");
+public void onLocationChanged(Location location)
+{
+    Log.e(TAG, "onLocationChanged: " + location);
+    
+    LastLocation.set(location);
+    Toast.makeText(getApplicationContext(),"location changed "+LastLocation.getLatitude(), Toast.LENGTH_SHORT).show();
+    //Gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(LastLocation.getLatitude(), LastLocation.getLongitude()), 15f));
+    Log.d(TAG, "onLocationChanged: camera following");
 
 
-        }
+}
+
 
         @Override
         public void onProviderDisabled(String provider)
