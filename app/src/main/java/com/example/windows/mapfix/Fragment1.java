@@ -3,8 +3,10 @@ package com.example.windows.mapfix;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.hardware.SensorManager;
@@ -20,6 +22,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,6 +64,7 @@ import java.util.Formatter;
 import java.util.Locale;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static com.google.android.gms.cast.CastRemoteDisplayLocalService.startService;
 
 public class Fragment1 extends Fragment implements IBaseGpsListener {
 
@@ -81,6 +85,7 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
     private GoogleMap Gmap;
     private FusedLocationProviderClient location_provider;
     private GeofencingClient mGeofencingClient;
+    public Notification1 notif = new Notification1();
 
     static ArrayList<Stops> next_stop = new ArrayList();
 
@@ -88,11 +93,27 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
 
     }
 
+    BroadcastReceiver messagerReceiver=new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            double speed = intent.getDoubleExtra(String.valueOf("extra_speed"), 0);
+            String speedtxt = String.format("%.1f", speed);
+            txtCurrentSpeed.setText(speedtxt + " KM/H");
+            Log.d(TAG, "onReceive: receive broadcast"+speedtxt);
+
+        }
+    };
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        LocalBroadcastManager.getInstance(getActivity().getBaseContext()).registerReceiver(messagerReceiver,new IntentFilter("speed"));
+
+
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment1, container, false);
@@ -152,6 +173,8 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         txtCurrentSpeed = (TextView) getView().findViewById(R.id.txtCurrentSpeed);
+        Log.d("textview",getView().findViewById(R.id.txtCurrentSpeed)+"");
+
         //this.updateSpeed(null);
         //CheckBox chkUseMetricUnits = (CheckBox) getView().findViewById(R.id.chkMetricUnits);
         getDeviceLocation();
@@ -194,6 +217,9 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
     public void onResume() {
         super.onResume();
         gMapView.onResume();
+        Intent intent = new Intent(getActivity(), TrackService.class);
+        getActivity().startService(intent);
+
     }
 
     @Override
@@ -206,6 +232,9 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
     public void onDestroy() {
         super.onDestroy();
         gMapView.onDestroy();
+        LocalBroadcastManager.getInstance(getActivity().getApplicationContext()).unregisterReceiver(messagerReceiver);
+        Log.d(TAG, "onDestroy: destroy");
+
     }
 
     @Override
@@ -285,7 +314,8 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
 
     private void doTrip(int start, int stop,int index) {
         Gmap.clear();
-
+        next_stop.clear();
+        int[]indexs = new int[Math.abs(start-stop)];
         double tempDistance = 0;
         //int count= stop-start;
         double speed = 22;
@@ -295,17 +325,34 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
         double etaM = 0;
         double totaldistance=0;
         //Log.d(TAG, "doTrip: start:"+start+"stop: "+stop+"count: "+count);
-        for (int i = start; i < stop; i++) {
-            findPath(MainActivity.ArrayTrain[index].getStop(i),MainActivity.ArrayTrain[index].getStop(i+1));
-            addMarker(MainActivity.ArrayTrain[index].getStop(i));
-            //Log.d(TAG, "doTrip: cari path dari "+MainActivity.ArrayTrain[index].getStop(i).getNama() + " "+i+" "+MainActivity.ArrayTrain[index].getStop(i+1).getNama()+" "+(i+1) );
-            tempDistance = findDistance(MainActivity.ArrayTrain[index].getStop(i),MainActivity.ArrayTrain[index].getStop(i+1));
-            totaldistance += tempDistance;
-            tempETA = tempDistance/speed;
-            next_stop.add(new Stops(MainActivity.ArrayTrain[index].getStop(i+1), Math.floor(tempDistance/1000), tempETA));
-            Log.d(TAG, "doTrip: next stop:"+next_stop.get(i-start).getStasiun().getNama());
-            tempDistance = 0;
-            tempETA = 0;
+        if(start > stop){
+            for (int j = start; j > stop; j--) {
+                findPath(MainActivity.ArrayTrain[index].getStop(j), MainActivity.ArrayTrain[index].getStop(j - 1));
+                addMarker(MainActivity.ArrayTrain[index].getStop(j));
+                //Log.d(TAG, "doTrip: cari path dari "+MainActivity.ArrayTrain[index].getStop(i).getNama() + " "+i+" "+MainActivity.ArrayTrain[index].getStop(i+1).getNama()+" "+(i+1) );
+                tempDistance = findDistance(MainActivity.ArrayTrain[index].getStop(j), MainActivity.ArrayTrain[index].getStop(j - 1));
+                totaldistance += tempDistance;
+                tempETA = tempDistance / speed;
+                next_stop.add(new Stops(MainActivity.ArrayTrain[index].getStop(j-1), Math.floor(tempDistance / 1000), tempETA));
+//                Log.d(TAG, "doTrip: next stop:" + next_stop.get(j - 1).getStasiun().getNama());
+                tempDistance = 0;
+                tempETA = 0;
+            }
+
+        }
+        else {
+            for (int i = start; i < stop; i++) {
+                findPath(MainActivity.ArrayTrain[index].getStop(i), MainActivity.ArrayTrain[index].getStop(i + 1));
+                addMarker(MainActivity.ArrayTrain[index].getStop(i));
+                //Log.d(TAG, "doTrip: cari path dari "+MainActivity.ArrayTrain[index].getStop(i).getNama() + " "+i+" "+MainActivity.ArrayTrain[index].getStop(i+1).getNama()+" "+(i+1) );
+                tempDistance = findDistance(MainActivity.ArrayTrain[index].getStop(i), MainActivity.ArrayTrain[index].getStop(i + 1));
+                totaldistance += tempDistance;
+                tempETA = tempDistance / speed;
+                next_stop.add(new Stops(MainActivity.ArrayTrain[index].getStop(i + 1), Math.floor(tempDistance / 1000), tempETA));
+                Log.d(TAG, "doTrip: next stop:" + next_stop.get(i - start).getStasiun().getNama());
+                tempDistance = 0;
+                tempETA = 0;
+            }
         }
         double totalDistanceKM = Math.floor(totaldistance/1000);
         Toast.makeText(getActivity(),"total distance : "+ totalDistanceKM + " KM",Toast.LENGTH_SHORT).show();
@@ -429,8 +476,8 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
         txtCurrentSpeed.setText(text);
     }*/
 
-    public static void changeSpeed(String speed){
-        curSpeed=speed;
+    private void sendBroadcastMessage(String speedtxt){
+        Intent inten = new Intent();
     }
 }
 
