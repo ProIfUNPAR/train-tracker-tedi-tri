@@ -13,10 +13,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Vibrator;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -28,9 +30,11 @@ import com.google.android.gms.maps.GoogleMap;
 
 import java.util.Formatter;
 import java.util.Locale;
+import java.util.Random;
 
 import static android.app.Notification.EXTRA_NOTIFICATION_ID;
 import static android.content.ContentValues.TAG;
+
 
 public class TrackService extends Service
 {
@@ -40,7 +44,7 @@ public class TrackService extends Service
     private int iteratorJarak = 0;
     private int iteratorTujuan = 0;
     static double speed;
-
+    static String speedtxt;
     public ScreenSlideActivity act = new ScreenSlideActivity();
     public int distance = 500;
     private static final String TAG = "Location_Update_Service";
@@ -51,6 +55,25 @@ public class TrackService extends Service
     private Notification1 notif = new Notification1();
     private static Vibrator vibrator;
     public double [] speeds = {20.72, 25.62, 27.81, 29.531};
+
+
+    public class LocalBinder extends Binder {
+        public TrackService getService() {
+            return TrackService.this;
+        }
+    }
+
+    private IBinder binder = new LocalBinder();
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        Log.d(TAG, "onBind: service bound");
+        return binder;
+    }
+
+
+
     private class LocationListener implements android.location.LocationListener {
         Location LastLocation;
 
@@ -73,36 +96,32 @@ public class TrackService extends Service
             LastLocation.set(location);
             Toast.makeText(getApplicationContext(),"location changed "+LastLocation.getLatitude(), Toast.LENGTH_SHORT).show();
             //Gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(LastLocation.getLatitude(), LastLocation.getLongitude()), 15f));
-            Log.d(TAG, "onLocationChanged: camera following");
+            //Log.d(TAG, "onLocationChanged: camera following");
             Fragment1.currentSpeed = location.getSpeed();
             speed = (Fragment1.currentSpeed * 3600)/1000;
-            String speedtxt;
-            speedtxt = String.format("%.1f", 100.45);
+            Random rnd=new Random();
+
+
             double distanceTraveled = speed * LOCATION_INTERVAL;
-            //Fragment1.txtCurrentSpeed.setText(speedtxt);
-            //Fragment1.changeSpeed(speedtxt);
+
             Toast.makeText(getApplicationContext(), "current speed " + speedtxt + " km/jam", Toast.LENGTH_SHORT).show();
             for(int i = 0;i<Fragment1.next_stop.size();i++){
                 Fragment1.next_stop.get(i).setJarak(distanceTraveled);
                 Fragment1.next_stop.get(i).setEta(LOCATION_INTERVAL);
             }
-            double temp = speeds[0];
-            //speedtxt = String.format("%.1f", temp);
-            //Fragment1.changeSpeed(speedtxt);
+            double temp = 140;
+            speedtxt = String.format("%.1f", temp);
+
             distance-=100;
             Log.d("distance", "distance " + distance);
-            //Toast.makeText(getApplicationContext(), "ditance " + distance , Toast.LENGTH_SHORT).show();
-            iterator+=1;
-            //if(iterator >= 2) {
-                sendBroadcastMessage(140);
-            //}
 
 
-            //if(distance <=300){
-                //Log.d("distance", "distance " + distance);
+
+
+
                 notif();
                 Toast.makeText(getApplicationContext(), "distance " + distance, Toast.LENGTH_SHORT).show();
-            //}
+
         }
 
 
@@ -130,11 +149,7 @@ public class TrackService extends Service
             new LocationListener(LocationManager.NETWORK_PROVIDER,Gmap)
     };
 
-    @Override
-    public IBinder onBind(Intent arg0)
-    {
-        return null;
-    }
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
@@ -188,13 +203,6 @@ public class TrackService extends Service
             mLocationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         }
     }
-    private void sendBroadcastMessage(double speed) {
-        Intent intent = new Intent("speed");
-        intent.putExtra("extra_speed",speed);
-        LocalBroadcastManager.getInstance(getBaseContext()).sendBroadcast(intent);
-        Log.d(TAG, "sendBroadcastMessage: sending braodcast"+speed+getApplicationContext().toString());
-
-    }
 
     public void notif(){
 
@@ -209,7 +217,7 @@ public class TrackService extends Service
                         .setContentTitle("Train Tracker")
                         .setContentText("You are less than 2 KM way from your destination. get ready!")
                         .setDefaults(Notification.DEFAULT_LIGHTS)
-                        .setVibrate(new long[]{100,5000})
+                        //.setVibrate(new long[]{100,5000})
                         .setAutoCancel(true);
 
         builder.setDeleteIntent(pendingIntent);

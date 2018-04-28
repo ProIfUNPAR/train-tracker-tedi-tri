@@ -4,9 +4,11 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.hardware.SensorManager;
@@ -15,6 +17,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -60,6 +64,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Formatter;
 import java.util.Locale;
 
@@ -89,30 +94,71 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
 
     static ArrayList<Stops> next_stop = new ArrayList();
 
+    TrackService tService;
+
+    boolean isBound = false;
+
     public Fragment1() {
 
     }
 
-    BroadcastReceiver messagerReceiver=new BroadcastReceiver() {
+    private ServiceConnection mConnection=new ServiceConnection() {
         @Override
-        public void onReceive(Context context, Intent intent) {
-            double speed = intent.getDoubleExtra(String.valueOf("extra_speed"), 0);
-            String speedtxt = String.format("%.1f", speed);
-            txtCurrentSpeed.setText(speedtxt + " KM/H");
-            Log.d(TAG, "onReceive: receive broadcast"+speedtxt);
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            TrackService.LocalBinder binder=(TrackService.LocalBinder) iBinder;
+            tService=binder.getService();
+            isBound=true;
 
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            isBound=false;
         }
     };
 
 
     @Override
+    public void onStart() {
+        super.onStart();
+        Intent intent = new Intent(getContext(), TrackService.class);
+        getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        getActivity().unbindService(mConnection);
+        isBound = false;
+    }
+
+    public String getSpeed(){
+        if(isBound){
+            String speed=TrackService.speedtxt;
+            return speed;
+        }else{
+            return "0";
+        }
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        final Handler handler =new Handler();
+        final Runnable r = new Runnable() {
+            public void run() {
+                handler.postDelayed(this, 2000);
 
-        LocalBroadcastManager.getInstance(getActivity().getBaseContext()).registerReceiver(messagerReceiver,new IntentFilter("speed"));
-
-
+                String speed= getSpeed();
+                txtCurrentSpeed.setText(speed);
+                Log.d(TAG, "run: speed is"+speed);
+            }
+        };
+        handler.postDelayed(r, 0000);
     }
+
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -208,7 +254,7 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
         });
         //int n = savedInstanceState.getInt("value");
         //your_train.setSelection(n);
-
+        Log.d(TAG, "Fragment1: "+getContext().toString());
         //next_stop.add(new Stops(MainActivity.ArrayTrain[1].getStop(1+1), 100.0, 100.0));
     }
 
@@ -232,7 +278,7 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
     public void onDestroy() {
         super.onDestroy();
         gMapView.onDestroy();
-        LocalBroadcastManager.getInstance(getActivity().getApplicationContext()).unregisterReceiver(messagerReceiver);
+
         Log.d(TAG, "onDestroy: destroy");
 
     }
@@ -476,9 +522,6 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
         txtCurrentSpeed.setText(text);
     }*/
 
-    private void sendBroadcastMessage(String speedtxt){
-        Intent inten = new Intent();
-    }
 }
 
 
