@@ -1,13 +1,21 @@
 package com.example.windows.mapfix;
 
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 
 import android.location.Location;
 import android.location.LocationManager;
 
+import android.os.Build;
+import android.os.Vibrator;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -47,16 +55,10 @@ import java.util.List;
 public class ScreenSlideActivity extends AppCompatActivity implements IBaseGpsListener {
     // dropdown first position, destination position
     private static final String TAG = "SlideActivity";
+    public Vibrator vibrator;
 
 
     private FusedLocationProviderClient location_provider;
-
-
-
-
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,11 +91,6 @@ public class ScreenSlideActivity extends AppCompatActivity implements IBaseGpsLi
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 
         //Firebase.setAndroidContext(this);
-
-
-
-
-
 
 
     }
@@ -154,34 +151,34 @@ public class ScreenSlideActivity extends AppCompatActivity implements IBaseGpsLi
         }
     }
 
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            // Inflate the layout for this fragment
-            return inflater.inflate(R.layout.activity_screen_slide, container, false);
-        }
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.activity_screen_slide, container, false);
+    }
 
 
-        //@Override
-        //public void onWindowFocusChanged(boolean hasFocus){
+    //@Override
+    //public void onWindowFocusChanged(boolean hasFocus){
 
 
+    public void finish() {
+        super.finish();
+        System.exit(0);
 
-
-        public void finish(){
-            super.finish();
-            System.exit(0);
-        }
-
-
-
-
-
-
-
-
-
-
-
-
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 

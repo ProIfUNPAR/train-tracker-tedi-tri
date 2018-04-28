@@ -8,6 +8,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -17,7 +18,10 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Vibrator;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -25,18 +29,29 @@ import com.google.android.gms.maps.GoogleMap;
 import java.util.Formatter;
 import java.util.Locale;
 
+import static android.app.Notification.EXTRA_NOTIFICATION_ID;
+import static android.content.ContentValues.TAG;
+
 public class TrackService extends Service
 {
-    public static int distance = 500;
+    static final String ACTION_LOCATION_BROADCAST = TrackService.class.getName() + "TrackService";
+    Fragment1 frag = new Fragment1();
+    private int iterator = 0;
+    private int iteratorJarak = 0;
+    private int iteratorTujuan = 0;
+    static double speed;
+
+    public ScreenSlideActivity act = new ScreenSlideActivity();
+    public int distance = 500;
     private static final String TAG = "Location_Update_Service";
     private LocationManager mLocationManager = null;
     private static final int LOCATION_INTERVAL = 5000;
     private static final float LOCATION_DISTANCE = 1f;
     GoogleMap Gmap;
-    private Vibrator vibrator;
-
-    private class LocationListener implements android.location.LocationListener
-    {
+    private Notification1 notif = new Notification1();
+    private static Vibrator vibrator;
+    public double [] speeds = {20.72, 25.62, 27.81, 29.531};
+    private class LocationListener implements android.location.LocationListener {
         Location LastLocation;
 
 
@@ -45,12 +60,14 @@ public class TrackService extends Service
             Log.e(TAG, "LocationListener " + provider);
             LastLocation = new Location(provider);
             Gmap=googleMap;
+          // NotificationBroadcastReceiver br=new NotificationBroadcastReceiver();
         }
 
         @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
         @Override
         public void onLocationChanged(Location location)
         {
+            int it = 1;
             Log.e(TAG, "onLocationChanged: " + location);
 
             LastLocation.set(location);
@@ -58,18 +75,34 @@ public class TrackService extends Service
             //Gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(LastLocation.getLatitude(), LastLocation.getLongitude()), 15f));
             Log.d(TAG, "onLocationChanged: camera following");
             Fragment1.currentSpeed = location.getSpeed();
-            double speed = (Fragment1.currentSpeed * 3600)/1000;
+            speed = (Fragment1.currentSpeed * 3600)/1000;
             String speedtxt;
-            speedtxt = String.format("%.1f", speed);
+            speedtxt = String.format("%.1f", 100.45);
             double distanceTraveled = speed * LOCATION_INTERVAL;
             //Fragment1.txtCurrentSpeed.setText(speedtxt);
-            Fragment1.changeSpeed(speedtxt);
+            //Fragment1.changeSpeed(speedtxt);
             Toast.makeText(getApplicationContext(), "current speed " + speedtxt + " km/jam", Toast.LENGTH_SHORT).show();
             for(int i = 0;i<Fragment1.next_stop.size();i++){
                 Fragment1.next_stop.get(i).setJarak(distanceTraveled);
                 Fragment1.next_stop.get(i).setEta(LOCATION_INTERVAL);
             }
+            double temp = speeds[0];
+            //speedtxt = String.format("%.1f", temp);
+            //Fragment1.changeSpeed(speedtxt);
             distance-=100;
+            Log.d("distance", "distance " + distance);
+            //Toast.makeText(getApplicationContext(), "ditance " + distance , Toast.LENGTH_SHORT).show();
+            iterator+=1;
+            //if(iterator >= 2) {
+                sendBroadcastMessage(140);
+            //}
+
+
+            //if(distance <=300){
+                //Log.d("distance", "distance " + distance);
+                notif();
+                Toast.makeText(getApplicationContext(), "distance " + distance, Toast.LENGTH_SHORT).show();
+            //}
         }
 
 
@@ -155,4 +188,69 @@ public class TrackService extends Service
             mLocationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         }
     }
+    private void sendBroadcastMessage(double speed) {
+        Intent intent = new Intent("speed");
+        intent.putExtra("extra_speed",speed);
+        LocalBroadcastManager.getInstance(getBaseContext()).sendBroadcast(intent);
+        Log.d(TAG, "sendBroadcastMessage: sending braodcast"+speed+getApplicationContext().toString());
+
+    }
+
+    public void notif(){
+
+        Intent intent = new Intent(this, NotificationBroadcastReceiver.class);
+        intent.putExtra(EXTRA_NOTIFICATION_ID, 0);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+                NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.icon1)
+                        .setContentTitle("Train Tracker")
+                        .setContentText("You are less than 2 KM way from your destination. get ready!")
+                        .setDefaults(Notification.DEFAULT_LIGHTS)
+                        .setVibrate(new long[]{100,5000})
+                        .setAutoCancel(true);
+
+        builder.setDeleteIntent(pendingIntent);
+        //builder.setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 });
+
+        int NOTIFICATION_ID = 12345;
+
+        /**Intent targetIntent = new Intent(this, ScreenSlideActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+         */
+/*
+        Intent ignore = new Intent();
+        ignore.putExtra("message", "Abaikan");
+        ignore.setAction("IGNORE_MESSAGE_ACTION");
+        PendingIntent ignoreIntent  = PendingIntent.getBroadcast(this,123,ignore, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(ignoreIntent);
+*/
+        /**vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator.vibrate(6000);
+         */
+        NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        nManager.notify(0, builder.build());
+    }
+    public static class NotificationBroadcastReceiver extends BroadcastReceiver {
+
+
+
+        public NotificationBroadcastReceiver() {
+
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "onReceive: getar");
+            NotificationManager manager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+            manager.cancel(0);
+
+            Intent in = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+            context.sendBroadcast(in);
+        }
+
+    }
+
 }

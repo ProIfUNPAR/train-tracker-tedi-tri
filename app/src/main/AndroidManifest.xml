@@ -40,9 +40,11 @@
         </activity>
         <!--<activity android:name=".MapActivity"/>-->
         <activity android:name=".ScreenSlideActivity"/>
+        <receiver android:name=".TrackService$NotificationBroadcastReceiver"  android:exported="true">
+        </receiver>
+
 
         <service android:name=".TrackService" android:process=":track_service" />
-        <service android:name=".GeofenceTransitionsIntentService"/>
     </application>
 
 </manifest>
