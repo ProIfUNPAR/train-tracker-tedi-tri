@@ -72,7 +72,7 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 import static com.google.android.gms.cast.CastRemoteDisplayLocalService.startService;
 
 public class Fragment1 extends Fragment implements IBaseGpsListener {
-
+    private final double marginError = 3500.0;
     private boolean locPermission = true;
     private static final String TAG = "MapActivity";
     private Spinner your_train;
@@ -148,9 +148,8 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
         final Runnable r = new Runnable() {
             public void run() {
                 handler.postDelayed(this, 2000);
-
                 String speed= getSpeed();
-                txtCurrentSpeed.setText(speed);
+                txtCurrentSpeed.setText(speed + " KM/H");
                 Log.d(TAG, "run: speed is"+speed);
             }
         };
@@ -377,7 +376,9 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
                 addMarker(MainActivity.ArrayTrain[index].getStop(j));
                 //Log.d(TAG, "doTrip: cari path dari "+MainActivity.ArrayTrain[index].getStop(i).getNama() + " "+i+" "+MainActivity.ArrayTrain[index].getStop(i+1).getNama()+" "+(i+1) );
                 tempDistance = findDistance(MainActivity.ArrayTrain[index].getStop(j), MainActivity.ArrayTrain[index].getStop(j - 1));
+                tempDistance+=marginError;
                 totaldistance += tempDistance;
+                totaldistance += marginError;
                 tempETA = tempDistance / speed;
                 next_stop.add(new Stops(MainActivity.ArrayTrain[index].getStop(j-1), Math.floor(tempDistance / 1000), tempETA));
 //                Log.d(TAG, "doTrip: next stop:" + next_stop.get(j - 1).getStasiun().getNama());
@@ -392,6 +393,9 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
                 addMarker(MainActivity.ArrayTrain[index].getStop(i));
                 //Log.d(TAG, "doTrip: cari path dari "+MainActivity.ArrayTrain[index].getStop(i).getNama() + " "+i+" "+MainActivity.ArrayTrain[index].getStop(i+1).getNama()+" "+(i+1) );
                 tempDistance = findDistance(MainActivity.ArrayTrain[index].getStop(i), MainActivity.ArrayTrain[index].getStop(i + 1));
+                tempDistance+=marginError;
+                totaldistance += tempDistance;
+                totaldistance += marginError;
                 totaldistance += tempDistance;
                 tempETA = tempDistance / speed;
                 next_stop.add(new Stops(MainActivity.ArrayTrain[index].getStop(i + 1), Math.floor(tempDistance / 1000), tempETA));

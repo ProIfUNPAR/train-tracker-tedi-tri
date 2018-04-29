@@ -110,15 +110,10 @@ public class TrackService extends Service
                 Fragment1.next_stop.get(i).setEta(LOCATION_INTERVAL);
             }
             double temp = 140;
-            speedtxt = String.format("%.1f", temp);
+            speedtxt = String.format("%.0f", speed);
 
             distance-=100;
             Log.d("distance", "distance " + distance);
-
-
-
-
-
                 notif();
                 Toast.makeText(getApplicationContext(), "distance " + distance, Toast.LENGTH_SHORT).show();
 
@@ -217,7 +212,7 @@ public class TrackService extends Service
                         .setContentTitle("Train Tracker")
                         .setContentText("You are less than 2 KM way from your destination. get ready!")
                         .setDefaults(Notification.DEFAULT_LIGHTS)
-                        //.setVibrate(new long[]{100,5000})
+                        .setVibrate(new long[]{100,5000})
                         .setAutoCancel(true);
 
         builder.setDeleteIntent(pendingIntent);

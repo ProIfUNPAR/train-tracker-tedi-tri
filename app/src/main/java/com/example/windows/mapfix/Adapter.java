@@ -30,6 +30,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.CardViewHolder>{
         CardView cardView;
         TextView nama;
         TextView jarak;
+        TextView eta;
 
 
         CardViewHolder(View itemView) {
@@ -37,6 +38,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.CardViewHolder>{
             cardView = (CardView)itemView.findViewById(R.id.cardview);
             nama = (TextView)itemView.findViewById(R.id.nama);
             jarak = (TextView)itemView.findViewById(R.id.jarak);
+            eta = (TextView)itemView.findViewById(R.id.eta);
 
         }
     }
@@ -50,7 +52,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.CardViewHolder>{
     @Override
     public void onBindViewHolder(CardViewHolder holder, int position) {
         holder.nama.setText(stops.get(position).getStasiun().getNama());
-        holder.jarak.setText(stops.get(position).getJarak()+" KM");
+        holder.jarak.setText(String.format("%.0f",stops.get(position).getJarak())+" KM");
+        holder.eta.setText(String.format("%.0f", stops.get(position).getEtaH()) + " H " +String.format("%.0f", stops.get(position).getEtaM()) + " M");
     }
 
     @Override

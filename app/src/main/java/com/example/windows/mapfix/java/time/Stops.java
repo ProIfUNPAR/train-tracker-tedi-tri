@@ -18,7 +18,7 @@ public class Stops {
         this.jarak = jarak;
         this.eta = eta;
         this.etaH = Math.floor(this.eta/3600);
-        this.etaM = Math.floor((this.etaH%3600)/60);
+        this.etaM = Math.floor((this.eta%3600)/60);
     }
     public Stasiun getStasiun(){
         return this.stasion;
