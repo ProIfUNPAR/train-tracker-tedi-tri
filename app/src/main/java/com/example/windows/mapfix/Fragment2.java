@@ -1,5 +1,6 @@
 package com.example.windows.mapfix;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -9,21 +10,26 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
 import com.example.windows.mapfix.java.time.Stops;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import static android.view.View.getDefaultSize;
 import static com.google.android.gms.plus.PlusOneDummyView.TAG;
 
 public class Fragment2 extends Fragment {
 
     protected static ArrayList<Stops> stops;
-    static RecyclerView rv;
+    static ListView list;
 
 
     public Fragment2() {
+
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -36,8 +42,6 @@ public class Fragment2 extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View RootView = inflater.inflate(R.layout.fragment2, container, false);
-
-
         return RootView;
 
     }
@@ -45,10 +49,10 @@ public class Fragment2 extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 
 
-        rv = (RecyclerView)getView().findViewById(R.id.rv);
-        rv.setHasFixedSize(true);
+        list = (ListView) getView().findViewById(R.id.simpleListView);
+        //rv.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
-        rv.setLayoutManager(llm);
+        //rv.setLayoutManager(llm);
         initData();
         initAdapter();
     }
@@ -59,17 +63,18 @@ public class Fragment2 extends Fragment {
         stops=Fragment1.next_stop;
     }
 
-    public static void changeCard(){
+    public void changeCard() {
         Log.d(TAG, "tes: waks");
         //Fragment1.next_stop.clear();
-        stops=Fragment1.next_stop;
-        Adapter adapter=new Adapter(stops);
-        rv.setAdapter(adapter);
+        stops = Fragment1.next_stop;
+        Adapter adapter = new Adapter(getContext(), stops);
+        list.setAdapter(adapter);
 
     }
 
+
     public void initAdapter(){
-        Adapter adapter = new Adapter(stops);
-        rv.setAdapter(adapter);
+        Adapter adapter = new Adapter(getContext(),stops);
+        list.setAdapter(adapter);
     }
 }

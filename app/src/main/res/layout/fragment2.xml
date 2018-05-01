@@ -4,13 +4,11 @@
     android:padding="1dip"
     >
 
-    <android.support.v7.widget.RecyclerView
+    <ListView
+        android:id="@+id/simpleListView"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:id="@+id/rv"
-        >
-
-    </android.support.v7.widget.RecyclerView>
-
-
+        android:divider="#00c4ff"
+        android:dividerHeight="2dp"
+        />
 </LinearLayout>

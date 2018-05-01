@@ -50,11 +50,11 @@ public class TrackService extends Service
     private static final String TAG = "Location_Update_Service";
     private LocationManager mLocationManager = null;
     private static final int LOCATION_INTERVAL = 5000;
-    private static final float LOCATION_DISTANCE = 1f;
+    private static final float LOCATION_DISTANCE = 50f;
     GoogleMap Gmap;
     private Notification1 notif = new Notification1();
     private static Vibrator vibrator;
-    public double [] speeds = {20.72, 25.62, 27.81, 29.531};
+    private static Location location1;
 
 
     public class LocalBinder extends Binder {
@@ -90,32 +90,47 @@ public class TrackService extends Service
         @Override
         public void onLocationChanged(Location location)
         {
+            double speedholder  = 25.0;
             int it = 1;
             Log.e(TAG, "onLocationChanged: " + location);
 
             LastLocation.set(location);
-            Toast.makeText(getApplicationContext(),"location changed "+LastLocation.getLatitude(), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(),"location changed "+LastLocation.getLatitude(), Toast.LENGTH_SHORT).show();
             //Gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(LastLocation.getLatitude(), LastLocation.getLongitude()), 15f));
             //Log.d(TAG, "onLocationChanged: camera following");
-            Fragment1.currentSpeed = location.getSpeed();
-            speed = (Fragment1.currentSpeed * 3600)/1000;
-            Random rnd=new Random();
-
+            speed = (location.getSpeed() * 3600)/1000;
 
             double distanceTraveled = speed * LOCATION_INTERVAL;
 
             Toast.makeText(getApplicationContext(), "current speed " + speedtxt + " km/jam", Toast.LENGTH_SHORT).show();
+
             for(int i = 0;i<Fragment1.next_stop.size();i++){
                 Fragment1.next_stop.get(i).setJarak(distanceTraveled);
-                Fragment1.next_stop.get(i).setEta(LOCATION_INTERVAL);
+                Fragment1.next_stop.get(i).setEta(60000);
             }
-            double temp = 140;
-            speedtxt = String.format("%.0f", speed);
+            Fragment2.stops = Fragment1.next_stop;
+            if(speed != 0.0){
+                speedtxt = String.format("%.0f", speed);
+                Fragment1.totaldistance-=distanceTraveled;
+            }
+            else{
+                speedtxt = String.format("%.0f", speedholder);
+                Fragment1.totaldistance -= LOCATION_DISTANCE;
+            }
 
-            distance-=100;
-            Log.d("distance", "distance " + distance);
-                notif();
-                Toast.makeText(getApplicationContext(), "distance " + distance, Toast.LENGTH_SHORT).show();
+            //distance-=100;
+            //Log.d("distance", "distance " + distance);
+
+            if(Fragment1.next_stop.size()!=0){
+                if(Fragment1.totaldistance<=2000 && Fragment1.totaldistance != 0 && iteratorJarak == 0) {
+                    notif();
+                    iteratorJarak++;
+                }
+                if(Fragment1.totaldistance <=50 && Fragment1.totaldistance != 0 && iteratorTujuan == 0){
+                    notifSampai();
+                    iteratorTujuan++;
+                }
+            }
 
         }
 
@@ -198,9 +213,41 @@ public class TrackService extends Service
             mLocationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         }
     }
+    public void notifSampai(){
+        Intent intent = new Intent(this, NotificationBroadcastReceiver.class);
+        intent.putExtra(EXTRA_NOTIFICATION_ID, 0);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.icon1)
+                        .setContentTitle("Train Tracker")
+                        .setContentText("You have arrived on your destination. Thank You!")
+                        .setDefaults(Notification.DEFAULT_LIGHTS)
+                        .setVibrate(new long[]{100,5000})
+                        .setAutoCancel(true);
+
+        builder.setDeleteIntent(pendingIntent);
+        //builder.setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 });
+        /**Intent targetIntent = new Intent(this, ScreenSlideActivity.class);
+         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+         */
+/*
+        Intent ignore = new Intent();
+        ignore.putExtra("message", "Abaikan");
+        ignore.setAction("IGNORE_MESSAGE_ACTION");
+        PendingIntent ignoreIntent  = PendingIntent.getBroadcast(this,123,ignore, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(ignoreIntent);
+*/
+        /**vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+         vibrator.vibrate(6000);
+         */
+        NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        nManager.notify(0, builder.build());
+    }
 
     public void notif(){
-
         Intent intent = new Intent(this, NotificationBroadcastReceiver.class);
         intent.putExtra(EXTRA_NOTIFICATION_ID, 0);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -217,9 +264,6 @@ public class TrackService extends Service
 
         builder.setDeleteIntent(pendingIntent);
         //builder.setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 });
-
-        int NOTIFICATION_ID = 12345;
-
         /**Intent targetIntent = new Intent(this, ScreenSlideActivity.class);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
          */
@@ -234,7 +278,7 @@ public class TrackService extends Service
         vibrator.vibrate(6000);
          */
         NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        nManager.notify(0, builder.build());
+        nManager.notify(1, builder.build());
     }
     public static class NotificationBroadcastReceiver extends BroadcastReceiver {
 
@@ -249,6 +293,7 @@ public class TrackService extends Service
             Log.d(TAG, "onReceive: getar");
             NotificationManager manager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
             manager.cancel(0);
+            manager.cancel(1);
 
             Intent in = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
             context.sendBroadcast(in);

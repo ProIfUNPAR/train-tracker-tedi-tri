@@ -38,19 +38,22 @@ public class Stops {
 
     public void setEta(double eta) {
         this.eta = this.eta-eta;
+        setEtaH();
+        setEtaM();
     }
 
     public void setJarak(double jarak) {
         this.jarak = this.jarak - jarak;
     }
 
-    public void setEtaH(double etaH) {
-        this.etaH = etaH;
+    public void setEtaH() {
+        this.etaH = Math.floor(this.eta/3600);
     }
 
-    public void setEtaM(double etaM) {
-        this.etaM = etaM;
+    public void setEtaM() {
+        this.etaM = Math.floor((this.eta%3600)/60);;
     }
+
 }
 
 

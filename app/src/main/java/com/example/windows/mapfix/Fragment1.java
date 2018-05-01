@@ -69,10 +69,10 @@ import java.util.Formatter;
 import java.util.Locale;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static com.example.windows.mapfix.Fragment2.stops;
 import static com.google.android.gms.cast.CastRemoteDisplayLocalService.startService;
 
 public class Fragment1 extends Fragment implements IBaseGpsListener {
-    private final double marginError = 3500.0;
     private boolean locPermission = true;
     private static final String TAG = "MapActivity";
     private Spinner your_train;
@@ -81,6 +81,7 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
     private Button buttonrute;
     public static double currentSpeed = 0.0;
     public int distance = 500;
+    public static double totaldistance = 0;
 
     public TextView txtCurrentSpeed;
     public static String curSpeed;
@@ -253,8 +254,6 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
         });
         //int n = savedInstanceState.getInt("value");
         //your_train.setSelection(n);
-        Log.d(TAG, "Fragment1: "+getContext().toString());
-        //next_stop.add(new Stops(MainActivity.ArrayTrain[1].getStop(1+1), 100.0, 100.0));
     }
 
 
@@ -363,24 +362,23 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
         int[]indexs = new int[Math.abs(start-stop)];
         double tempDistance = 0;
         //int count= stop-start;
-        double speed = 22;
+        double speed = 19.5;
         double tempETA = 0;
         double eta = 0;
         double etaH = 0;
         double etaM = 0;
-        double totaldistance=0;
         //Log.d(TAG, "doTrip: start:"+start+"stop: "+stop+"count: "+count);
         if(start > stop){
+            totaldistance = 0;
+            tempETA = 0;
             for (int j = start; j > stop; j--) {
                 findPath(MainActivity.ArrayTrain[index].getStop(j), MainActivity.ArrayTrain[index].getStop(j - 1));
                 addMarker(MainActivity.ArrayTrain[index].getStop(j));
                 //Log.d(TAG, "doTrip: cari path dari "+MainActivity.ArrayTrain[index].getStop(i).getNama() + " "+i+" "+MainActivity.ArrayTrain[index].getStop(i+1).getNama()+" "+(i+1) );
                 tempDistance = findDistance(MainActivity.ArrayTrain[index].getStop(j), MainActivity.ArrayTrain[index].getStop(j - 1));
-                tempDistance+=marginError;
                 totaldistance += tempDistance;
-                totaldistance += marginError;
-                tempETA = tempDistance / speed;
-                next_stop.add(new Stops(MainActivity.ArrayTrain[index].getStop(j-1), Math.floor(tempDistance / 1000), tempETA));
+                tempETA = totaldistance / speed;
+                next_stop.add(new Stops(MainActivity.ArrayTrain[index].getStop(j-1), Math.floor(totaldistance / 1000), tempETA));
 //                Log.d(TAG, "doTrip: next stop:" + next_stop.get(j - 1).getStasiun().getNama());
                 tempDistance = 0;
                 tempETA = 0;
@@ -388,17 +386,16 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
 
         }
         else {
+            totaldistance = 0;
+            tempETA = 0;
             for (int i = start; i < stop; i++) {
                 findPath(MainActivity.ArrayTrain[index].getStop(i), MainActivity.ArrayTrain[index].getStop(i + 1));
                 addMarker(MainActivity.ArrayTrain[index].getStop(i));
                 //Log.d(TAG, "doTrip: cari path dari "+MainActivity.ArrayTrain[index].getStop(i).getNama() + " "+i+" "+MainActivity.ArrayTrain[index].getStop(i+1).getNama()+" "+(i+1) );
                 tempDistance = findDistance(MainActivity.ArrayTrain[index].getStop(i), MainActivity.ArrayTrain[index].getStop(i + 1));
-                tempDistance+=marginError;
                 totaldistance += tempDistance;
-                totaldistance += marginError;
-                totaldistance += tempDistance;
-                tempETA = tempDistance / speed;
-                next_stop.add(new Stops(MainActivity.ArrayTrain[index].getStop(i + 1), Math.floor(tempDistance / 1000), tempETA));
+                tempETA = totaldistance / speed;
+                next_stop.add(new Stops(MainActivity.ArrayTrain[index].getStop(i + 1), Math.floor(totaldistance / 1000), tempETA));
                 Log.d(TAG, "doTrip: next stop:" + next_stop.get(i - start).getStasiun().getNama());
                 tempDistance = 0;
                 tempETA = 0;
@@ -415,7 +412,7 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
         for (int i = 0; i < next_stop.size() ; i++) {
             Log.d(TAG, "doTrip: ns"+next_stop.get(i).getStasiun().getNama());
         }
-        Fragment2.changeCard();
+        changeData();
     }
     public void addMarker(Stasiun st){
         Gmap.addMarker(new MarkerOptions()
@@ -525,6 +522,16 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
     /**public static  void setText(String text){
         txtCurrentSpeed.setText(text);
     }*/
+
+    public void changeData(){
+        //next_stop.clear();
+        Fragment2.stops=Fragment1.next_stop;
+
+        Adapter adapter=new Adapter(getContext(),stops);
+        adapter.notifyDataSetChanged();
+        Fragment2.list.setAdapter(adapter);
+        Log.d(TAG, "changeData: ");
+    }
 
 }
 
