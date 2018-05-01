@@ -117,16 +117,19 @@ public class TrackService extends Service
                 speedtxt = String.format("%.0f", speedholder);
                 Fragment1.totaldistance -= LOCATION_DISTANCE;
             }
-
             //distance-=100;
             //Log.d("distance", "distance " + distance);
-
             if(Fragment1.next_stop.size()!=0){
-                if(Fragment1.totaldistance<=2000 && Fragment1.totaldistance != 0 && iteratorJarak == 0) {
+                int n = Fragment1.next_stop.size();
+                location1 = new Location("provider");
+                location1.setLatitude(Fragment1.next_stop.get(n-1).getStasiun().getLatitude());
+                location1.setLongitude(Fragment1.next_stop.get(n-1).getStasiun().getLongitude());
+                double distance = location.distanceTo(location1);
+                if(distance<2000 && iteratorJarak == 0) {
                     notif();
                     iteratorJarak++;
                 }
-                if(Fragment1.totaldistance <=50 && Fragment1.totaldistance != 0 && iteratorTujuan == 0){
+                if(distance < 50 && iteratorTujuan == 0){
                     notifSampai();
                     iteratorTujuan++;
                 }

@@ -378,7 +378,7 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
                 tempDistance = findDistance(MainActivity.ArrayTrain[index].getStop(j), MainActivity.ArrayTrain[index].getStop(j - 1));
                 totaldistance += tempDistance;
                 tempETA = totaldistance / speed;
-                next_stop.add(new Stops(MainActivity.ArrayTrain[index].getStop(j-1), Math.floor(totaldistance / 1000), tempETA));
+                next_stop.add(new Stops(MainActivity.ArrayTrain[index].getStop(j-1), totaldistance , tempETA));
 //                Log.d(TAG, "doTrip: next stop:" + next_stop.get(j - 1).getStasiun().getNama());
                 tempDistance = 0;
                 tempETA = 0;
@@ -395,19 +395,25 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
                 tempDistance = findDistance(MainActivity.ArrayTrain[index].getStop(i), MainActivity.ArrayTrain[index].getStop(i + 1));
                 totaldistance += tempDistance;
                 tempETA = totaldistance / speed;
-                next_stop.add(new Stops(MainActivity.ArrayTrain[index].getStop(i + 1), Math.floor(totaldistance / 1000), tempETA));
+                next_stop.add(new Stops(MainActivity.ArrayTrain[index].getStop(i + 1), totaldistance, tempETA));
                 Log.d(TAG, "doTrip: next stop:" + next_stop.get(i - start).getStasiun().getNama());
                 tempDistance = 0;
                 tempETA = 0;
             }
         }
         double totalDistanceKM = Math.floor(totaldistance/1000);
-        Toast.makeText(getActivity(),"total distance : "+ totalDistanceKM + " KM",Toast.LENGTH_SHORT).show();
+
         eta = totaldistance/speed;
         etaH = eta/3600;
         etaH = Math.floor(etaH);
-        etaM = (eta%3600)/60;
+        etaM = Math.ceil(eta%3600)/60;
         etaM = Math.floor(etaM);
+        if(totaldistance<1000){
+            Toast.makeText(getActivity(),"total distance : "+ totaldistance + " KM",Toast.LENGTH_SHORT).show();
+        }
+        else{
+            Toast.makeText(getActivity(),"total distance : "+ totalDistanceKM + " KM",Toast.LENGTH_SHORT).show();
+        }
         Toast.makeText(getActivity(),"estimated time of arrival " + etaH +" jam " + etaM + " menit",Toast.LENGTH_SHORT).show();
         for (int i = 0; i < next_stop.size() ; i++) {
             Log.d(TAG, "doTrip: ns"+next_stop.get(i).getStasiun().getNama());
