@@ -16,8 +16,10 @@ Train tracker adalah aplikasi yang digunakan untuk sebagai asisten dalam perjala
 2. install di smartphone anda
 
 ## Dibuat dengan :
-'1. Android studio
-2. Firebase'
+```
+1. Android studio
+2. Firebase
+```
 
 ## Author :
 1. Tedi Tri Ramdani - [ladiesman2177](https://github.com/ladiesman2177) & [teditri24](https://github.com/teditri24)
