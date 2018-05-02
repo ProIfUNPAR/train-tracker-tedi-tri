@@ -12,7 +12,7 @@ Train tracker adalah aplikasi yang digunakan untuk sebagai asisten dalam perjala
 4. Menampilkan list stasiun yang akan dilewati
 
 ## Instalasi : 
-1. Download apk dari 
+1. Download apk [train tracker](https://github.com/ProIfUNPAR/train-tracker-tedi-tri/blob/master/Train-TrackerV1.1.apk)
 2. install di smartphone anda
 
 ## Dibuat dengan :
