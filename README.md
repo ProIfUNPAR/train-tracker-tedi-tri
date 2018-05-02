@@ -11,4 +11,8 @@ Fitur-fitur:
 3. Menampilkan kecepatan 
 4. Menampilkan list stasiun yang akan dilewati
 
+# Instalasi : 
+1. Download apk dari 
+2. install di smartphone anda
+
 
