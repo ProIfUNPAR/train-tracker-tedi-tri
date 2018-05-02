@@ -20,8 +20,8 @@ Train tracker adalah aplikasi yang digunakan untuk sebagai asisten dalam perjala
 2. Firebase'
 
 ## Author :
-1. Tedi Tri Ramdani - [ladiesman2177] (https://github.com/ladiesman2177) & [teditri24](https://github.com/teditri24)
-2. Muhamad Rifqi M - [komodoman123] (https://github.com/komodoman123)
+1. Tedi Tri Ramdani - [ladiesman2177](https://github.com/ladiesman2177) & [teditri24](https://github.com/teditri24)
+2. Muhamad Rifqi M - [komodoman123](https://github.com/komodoman123)
 3. Sandy Giovanni - [SandyGio](https://github.com/SandyGio)
 4. Andreas Bagus Maldini - [andreasbagus](https://github.com/andreasbagus)
 5. Aditya Putra Leksono - [adityaputral](https://github.com/adityaputral)
