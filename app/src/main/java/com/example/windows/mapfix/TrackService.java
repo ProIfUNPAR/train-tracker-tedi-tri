@@ -55,6 +55,7 @@ public class TrackService extends Service
     private Notification1 notif = new Notification1();
     private static Vibrator vibrator;
     private static Location location1;
+    double speedzero = 0.0;
 
 
     public class LocalBinder extends Binder {
@@ -102,7 +103,7 @@ public class TrackService extends Service
 
             double distanceTraveled = speed * LOCATION_INTERVAL;
 
-            Toast.makeText(getApplicationContext(), "current speed " + speedtxt + " km/jam", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), "current speed " + speedtxt + " km/jam", Toast.LENGTH_SHORT).show();
 
             for(int i = 0;i<Fragment1.next_stop.size();i++){
                 Fragment1.next_stop.get(i).setJarak(distanceTraveled);
@@ -114,7 +115,7 @@ public class TrackService extends Service
                 Fragment1.totaldistance-=distanceTraveled;
             }
             else{
-                speedtxt = String.format("%.0f", speedholder);
+                speedtxt = String.format("%.0f", speedzero);
                 Fragment1.totaldistance -= LOCATION_DISTANCE;
             }
             //distance-=100;
@@ -125,11 +126,12 @@ public class TrackService extends Service
                 location1.setLatitude(Fragment1.next_stop.get(n-1).getStasiun().getLatitude());
                 location1.setLongitude(Fragment1.next_stop.get(n-1).getStasiun().getLongitude());
                 double distance = location.distanceTo(location1);
+
                 if(distance<2000 && iteratorJarak == 0) {
                     notif();
                     iteratorJarak++;
                 }
-                if(distance < 50 && iteratorTujuan == 0){
+                if(distance <= 50 && iteratorTujuan == 0){
                     notifSampai();
                     iteratorTujuan++;
                 }
@@ -217,9 +219,9 @@ public class TrackService extends Service
         }
     }
     public void notifSampai(){
-        Intent intent = new Intent(this, NotificationBroadcastReceiver.class);
-        intent.putExtra(EXTRA_NOTIFICATION_ID, 0);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(EXTRA_NOTIFICATION_ID, 1);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this.getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
         NotificationCompat.Builder builder =
@@ -228,7 +230,7 @@ public class TrackService extends Service
                         .setContentTitle("Train Tracker")
                         .setContentText("You have arrived on your destination. Thank You!")
                         .setDefaults(Notification.DEFAULT_LIGHTS)
-                        .setVibrate(new long[]{100,5000})
+                        .setVibrate(new long[]{0,5000})
                         .setAutoCancel(true);
 
         builder.setDeleteIntent(pendingIntent);
@@ -247,7 +249,7 @@ public class TrackService extends Service
          vibrator.vibrate(6000);
          */
         NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        nManager.notify(0, builder.build());
+        nManager.notify(1, builder.build());
     }
 
     public void notif(){
@@ -262,7 +264,7 @@ public class TrackService extends Service
                         .setContentTitle("Train Tracker")
                         .setContentText("You are less than 2 KM way from your destination. get ready!")
                         .setDefaults(Notification.DEFAULT_LIGHTS)
-                        .setVibrate(new long[]{100,5000})
+                        .setVibrate(new long[]{0,5000})
                         .setAutoCancel(true);
 
         builder.setDeleteIntent(pendingIntent);

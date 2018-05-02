@@ -406,15 +406,14 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
         eta = totaldistance/speed;
         etaH = eta/3600;
         etaH = Math.floor(etaH);
-        etaM = Math.ceil(eta%3600)/60;
-        etaM = Math.floor(etaM);
+        etaM = Math.ceil((eta%3600)/60);
         if(totaldistance<1000){
-            Toast.makeText(getActivity(),"total distance : "+ totaldistance + " KM",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(),"total distance : "+ String.format("%.0f",totaldistance) + " M",Toast.LENGTH_SHORT).show();
         }
         else{
             Toast.makeText(getActivity(),"total distance : "+ totalDistanceKM + " KM",Toast.LENGTH_SHORT).show();
         }
-        Toast.makeText(getActivity(),"estimated time of arrival " + etaH +" jam " + etaM + " menit",Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(),"estimated time of arrival " + String.format("%.0f",etaH) +" hour(s) " + String.format("%.0f",etaM) + " minute(s)",Toast.LENGTH_SHORT).show();
         for (int i = 0; i < next_stop.size() ; i++) {
             Log.d(TAG, "doTrip: ns"+next_stop.get(i).getStasiun().getNama());
         }
