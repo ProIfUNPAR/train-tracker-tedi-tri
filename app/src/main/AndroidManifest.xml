@@ -31,13 +31,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        <activity android:name=".MainActivity"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <!--<activity android:name=".MapActivity"/>-->
         <activity android:name=".ScreenSlideActivity"/>
         <receiver android:name=".TrackService$NotificationBroadcastReceiver"  android:exported="true">

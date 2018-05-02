@@ -44,8 +44,8 @@ public class MainActivity extends AppCompatActivity {
     DatabaseReference markerStasiun = FirebaseDatabase.getInstance().getReference().child("Stasiun");
     DatabaseReference markerKereta = FirebaseDatabase.getInstance().getReference().child("Kereta");
 
-    public static Stasiun[] ArrayStasiun = new Stasiun[99];
-    public static Train[] ArrayTrain = new Train[21];
+    public static Stasiun[] ArrayStasiun = new Stasiun[97];
+    public static Train[] ArrayTrain = new Train[20];
     private static final int ERROR_DIALOG_REQUEST=9001;
     //Button btnNotif;
     @Override

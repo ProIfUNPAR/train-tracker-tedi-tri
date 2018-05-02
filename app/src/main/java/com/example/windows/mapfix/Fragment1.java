@@ -73,6 +73,7 @@ import static com.example.windows.mapfix.Fragment2.stops;
 import static com.google.android.gms.cast.CastRemoteDisplayLocalService.startService;
 
 public class Fragment1 extends Fragment implements IBaseGpsListener {
+    static Adapter adapter;
     private boolean locPermission = true;
     private static final String TAG = "MapActivity";
     private Spinner your_train;
@@ -150,7 +151,12 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
             public void run() {
                 handler.postDelayed(this, 2000);
                 String speed= getSpeed();
-                txtCurrentSpeed.setText(speed + " KM/H");
+                if (speed != null){
+                    txtCurrentSpeed.setText(speed + " KM/H");
+                }
+                else{
+                    txtCurrentSpeed.setText("0 KM/H");
+                }
                 Log.d(TAG, "run: speed is"+speed);
             }
         };
@@ -378,6 +384,7 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
                 tempDistance = findDistance(MainActivity.ArrayTrain[index].getStop(j), MainActivity.ArrayTrain[index].getStop(j - 1));
                 totaldistance += tempDistance;
                 tempETA = totaldistance / speed;
+                Log.d("tempeta", tempETA + "");
                 next_stop.add(new Stops(MainActivity.ArrayTrain[index].getStop(j-1), totaldistance , tempETA));
 //                Log.d(TAG, "doTrip: next stop:" + next_stop.get(j - 1).getStasiun().getNama());
                 tempDistance = 0;
@@ -531,9 +538,7 @@ public class Fragment1 extends Fragment implements IBaseGpsListener {
     public void changeData(){
         //next_stop.clear();
         Fragment2.stops=Fragment1.next_stop;
-
-        Adapter adapter=new Adapter(getContext(),stops);
-        adapter.notifyDataSetChanged();
+        adapter=new Adapter(getContext(),stops);
         Fragment2.list.setAdapter(adapter);
         Log.d(TAG, "changeData: ");
     }

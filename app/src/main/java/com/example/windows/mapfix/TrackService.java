@@ -55,6 +55,7 @@ public class TrackService extends Service
     private Notification1 notif = new Notification1();
     private static Vibrator vibrator;
     private static Location location1;
+    private static Location location2;
     double speedzero = 0.0;
 
 
@@ -107,10 +108,12 @@ public class TrackService extends Service
 
             for(int i = 0;i<Fragment1.next_stop.size();i++){
                 Fragment1.next_stop.get(i).setJarak(distanceTraveled);
-                Fragment1.next_stop.get(i).setEta(60000);
+                Fragment1.next_stop.get(i).setEta(LOCATION_INTERVAL/1000);
             }
-            Fragment2.stops = Fragment1.next_stop;
-            if(speed != 0.0){
+
+
+
+            if(speed > 0.0){
                 speedtxt = String.format("%.0f", speed);
                 Fragment1.totaldistance-=distanceTraveled;
             }
@@ -127,6 +130,10 @@ public class TrackService extends Service
                 location1.setLongitude(Fragment1.next_stop.get(n-1).getStasiun().getLongitude());
                 double distance = location.distanceTo(location1);
 
+                location2 = new Location("provider");
+                location2.setLatitude(Fragment1.next_stop.get(iterator).getStasiun().getLatitude());
+                location2.setLongitude(Fragment1.next_stop.get(iterator).getStasiun().getLongitude());
+
                 if(distance<2000 && iteratorJarak == 0) {
                     notif();
                     iteratorJarak++;
@@ -135,6 +142,15 @@ public class TrackService extends Service
                     notifSampai();
                     iteratorTujuan++;
                 }
+                if(location.distanceTo(location2) <= 50){
+                    Fragment1.next_stop.remove(iterator);
+                    iterator++;
+                }
+            }
+            Fragment2.stops = Fragment1.next_stop;
+
+            if(Fragment1.adapter!=null) {
+                Fragment1.adapter.notifyDataSetChanged();
             }
 
         }

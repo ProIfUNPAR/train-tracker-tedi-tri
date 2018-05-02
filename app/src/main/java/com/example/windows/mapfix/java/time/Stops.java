@@ -51,7 +51,7 @@ public class Stops {
     }
 
     public void setEtaM() {
-        this.etaM = Math.floor((this.eta%3600)/60);;
+        this.etaM = Math.ceil((this.eta%3600)/60);;
     }
 
 }

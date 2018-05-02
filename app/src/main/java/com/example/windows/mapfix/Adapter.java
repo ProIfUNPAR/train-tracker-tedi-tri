@@ -66,7 +66,7 @@ public class Adapter extends BaseAdapter{
             jarak.setText(String.format("%.0f",stops.get(i).getJarak()) + " M");
         }
         else {
-            jarak.setText(String.format("%.0f", stops.get(i).getJarak()) + " KM");
+            jarak.setText(String.format("%.0f", Math.floor(stops.get(i).getJarak())/1000) + " KM");
         }
         eta.setText(String.format("%.0f",stops.get(i).getEtaH()) + " H " + String.format("%.0f",stops.get(i).getEtaM()) + " M");
 
